@@ -113,20 +113,24 @@
     box-shadow:0 6px 0 #7d5a14;
   }
 
+  .lockwho{font-size:15px;font-weight:800;color:var(--gold);letter-spacing:.12em;margin:12px 0 0}
+  .kanji-link{margin-top:34px;font-size:12px;color:#5a5343}
+  .kanji-link a{color:#6e6650;text-decoration:underline}
+
   /* ==== pick screen ==== */
-  #pick{padding-top:56px}
+  #pick,#who{padding-top:56px}
   .kaikin{
     text-align:center;font-size:34px;font-weight:900;letter-spacing:.2em;
     color:var(--gold);margin:10px 0 2px;
     text-shadow:0 0 30px rgba(232,182,76,.4);
   }
   .pick-sub{text-align:center;color:var(--bone-dim);font-size:14px;margin-bottom:18px}
-  #namefilter{
+  #namefilter,#whofilter{
     width:100%;padding:12px 16px;font-size:16px;color:var(--bone);
     background:var(--ink2);border:2px solid #3a352b;border-radius:12px;outline:none;margin-bottom:14px;
     font-family:inherit;
   }
-  #namefilter:focus{border-color:var(--gold)}
+  #namefilter:focus,#whofilter:focus{border-color:var(--gold)}
   .namegrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .namebtn{
     padding:14px 8px;font-size:15px;font-weight:700;color:var(--bone);
@@ -182,6 +186,21 @@
   .tablecard ul{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:6px}
   .tablecard li{font-size:14px;font-weight:700;padding:5px 12px;background:#1e1a13;border-radius:999px}
 
+  /* ==== 幹事コンソール ==== */
+  .btn-blood{
+    padding:18px 28px;font-size:17px;color:#fff;
+    background:linear-gradient(180deg,#e0483e,#a32620);
+    box-shadow:0 6px 0 #5e120e;margin:6px 0 10px;
+  }
+  .admin-h{font-size:13px;font-weight:900;letter-spacing:.3em;color:var(--bone-dim);text-align:center;margin:30px 0 12px}
+  .attempt-row{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:10px 14px;background:var(--ink2);border:1.5px solid #35301f;
+    border-radius:10px;margin-bottom:8px;font-size:14px;font-weight:700;
+  }
+  .attempt-row .t{color:var(--blood);font-variant-numeric:tabular-nums}
+  .attempt-empty{text-align:center;color:#5f9c6e;font-size:13px;font-weight:700;padding:10px}
+
   /* ==== フライング記録 ==== */
   .record-warn{
     font-size:11.5px;color:#8a6d05;line-height:1.9;margin:-14px 0 20px;
@@ -215,18 +234,32 @@
 
 <div id="app">
 
+  <!-- ⓪まず名を名乗る -->
+  <section class="screen" id="who">
+    <div class="kaikin" style="font-size:26px">☠️ 名を名乗れ ☠️</div>
+    <p class="pick-sub">まず自分の名前を選べ。<br>他人の名を騙った者にも罰が下る。</p>
+    <input id="whofilter" type="text" placeholder="名前で検索…" autocomplete="off">
+    <div class="namegrid" id="whogrid"></div>
+  </section>
+
   <!-- ①ドクロのロック画面 -->
   <section class="screen on" id="lock">
     <div class="skull" id="skull">☠️</div>
     <h1>席決めの儀</h1>
+    <p class="lockwho" id="lockwho"></p>
     <p class="warn-line">幹事がボタンを押すまでは<br><em>まだ開くな</em>って言ったよな…？</p>
-    <p class="sub">幹事の合図で「解禁コード」が発表される。<br>それまでこの封印は解けない。</p>
-    <p class="record-warn">⚠️ 解錠の試みは、すべてこの端末に記録される。<br>記録は抽選結果と一緒に晒される。覚悟しろ。</p>
+    <p class="sub">幹事がOKを出せば、封印はひとりでに解ける。<br>この画面のまま、その時を待て。</p>
+    <p class="record-warn">⚠️ 解錠の試みは、すべて記録され幹事に通報される。<br>記録は抽選結果と一緒に晒される。覚悟しろ。</p>
     <div class="skullmsg" id="skullmsg"></div>
     <div class="codebox">
       <input type="tel" id="code" maxlength="4" placeholder="0000" autocomplete="off">
       <button class="btn btn-hazard" id="unlockbtn">解錠</button>
     </div>
+    <p class="sub" style="margin-top:-24px">↑ 予備: 幹事がコードを口頭発表した場合のみ使う</p>
+    <p class="kanji-link">
+      <a href="#" id="renamelink">名前をまちがえた</a> ／
+      <a href="#" id="adminlink">幹事の方はこちら</a>
+    </p>
   </section>
 
   <!-- ②名前えらび -->
@@ -273,13 +306,43 @@
     </div>
   </section>
 
+  <!-- ⑥幹事コンソール -->
+  <section class="screen" id="admin">
+    <div class="all-title">— 幹事コンソール —</div>
+    <div class="center" id="adminlogin">
+      <p class="pick-sub">幹事用PINを入力</p>
+      <div class="codebox">
+        <input type="tel" id="adminpin" maxlength="8" placeholder="PIN" autocomplete="off">
+        <button class="btn btn-hazard" id="adminloginbtn">入る</button>
+      </div>
+      <div class="skullmsg" id="adminmsg"></div>
+    </div>
+    <div id="adminmain" style="display:none">
+      <div class="center">
+        <p class="pick-sub" id="adminstate">状態を確認中…</p>
+        <button class="btn btn-blood" id="unlockallbtn">🔓 全員の封印を解く</button>
+      </div>
+      <h3 class="admin-h">☠️ フライング検挙リスト ☠️</h3>
+      <div id="attemptlist"></div>
+    </div>
+    <div class="toolrow">
+      <button class="btn btn-ghost" id="adminresetbtn" style="display:none">リセット(リハーサル用)</button>
+      <button class="btn btn-ghost" id="adminbackbtn">もどる</button>
+    </div>
+  </section>
+
 </div>
 
 <script>
 /* ================================================================
    ★★★ 幹事が編集するのはここだけ ★★★
    ---------------------------------------------------------------
-   CODE   : 解禁コード(4桁)。当日マイクで発表するまで秘密。
+   SERVER : 極小サーバーのURL(末尾スラッシュなし)。
+            設定すると「幹事がボタンを押した瞬間に全員自動解錠」
+            +「フライングが名前つきで幹事に通報」される。
+            空文字 "" にするとサーバーなしの単独モードで動く。
+   CODE   : 解禁コード(4桁)。サーバー障害時の予備手段として
+            当日マイクで発表すれば手入力でも解錠できる。
             ※コードを変えると抽選結果も変わります。
    GUESTS : ゲストの名簿。g は "M"(男性) / "F"(女性)。
             「女性だけの卓」ができないように内部で使うだけで、
@@ -290,6 +353,7 @@
             こと。全員の抽選結果が変わってしまいます。
    ================================================================ */
 const CONFIG = {
+  SERVER: "",
   CODE: "0705",
   TABLES: 8,
   GUESTS: [
@@ -411,6 +475,30 @@ function renderRecord(){
   }
 }
 
+/* --- 名前グリッド(名乗り画面と選び直し画面で共用) --- */
+function buildGrid(gridEl, filter, onpick){
+  gridEl.innerHTML = "";
+  CONFIG.GUESTS
+    .filter(p => p.n.replace(/\s/g,"").includes(filter.replace(/\s/g,"")))
+    .forEach(p=>{
+      const b = document.createElement("button");
+      b.className = "namebtn";
+      b.textContent = p.n;
+      b.addEventListener("click", ()=> onpick(p));
+      gridEl.appendChild(b);
+    });
+}
+function buildNameGrid(filter=""){ buildGrid($("namegrid"), filter, p=> startRoll(p.n)); }
+function buildWhoGrid(filter=""){
+  buildGrid($("whogrid"), filter, p=>{
+    lsSet("sekigime_me", p.n);
+    enterLock();
+  });
+}
+$("namefilter").addEventListener("input", e=> buildNameGrid(e.target.value));
+$("whofilter").addEventListener("input", e=> buildWhoGrid(e.target.value));
+function getMe(){ return lsGet("sekigime_me", null); }
+
 /* --- ロック画面 --- */
 const angryLines = [
   "…違うな。まだその時ではない。",
@@ -421,20 +509,37 @@ const angryLines = [
 ];
 let wrongCount = 0;
 
+function enterLock(){
+  const me = getMe();
+  $("lockwho").textContent = me ? `${me} よ――` : "";
+  show("lock");
+  startPolling();
+}
+
+/* 解錠成功時の共通処理(コード手入力・サーバー自動解錠の両方から呼ぶ) */
+function doUnlock(){
+  stopPolling();
+  tables = drawTables(CONFIG.CODE);
+  if(!tables){
+    $("skullmsg").textContent = "⚠️ 男性が少なすぎて『女性だけの卓を作らない』条件を満たせません";
+    return;
+  }
+  sessionStorage.setItem("sekigime_code", CONFIG.CODE);
+  burstConfetti(140);
+  const me = getMe();
+  if(me){ startRoll(me); }
+  else{ buildNameGrid(); show("pick"); }
+}
+
 function tryUnlock(){
   const v = $("code").value.trim();
   if(v === CONFIG.CODE){
-    tables = drawTables(CONFIG.CODE);
-    if(!tables){
-      $("skullmsg").textContent = "⚠️ 男性が少なすぎて『女性だけの卓を作らない』条件を満たせません";
-      return;
-    }
-    sessionStorage.setItem("sekigime_code", v);
-    buildNameGrid();
-    show("pick");
-    burstConfetti(140);
+    doUnlock();
   }else{
-    if(v) logAttempt();   // 動かぬ証拠。結果画面で晒される(空タップは除く)
+    if(v){                 // 動かぬ証拠(空タップは除く)。端末に記録+幹事に通報
+      logAttempt();
+      reportAttempt();
+    }
     const s = $("skull");
     s.classList.remove("angry"); void s.offsetWidth; s.classList.add("angry");
     $("skullmsg").textContent = angryLines[Math.min(wrongCount, angryLines.length-1)];
@@ -444,31 +549,42 @@ function tryUnlock(){
 }
 $("unlockbtn").addEventListener("click", tryUnlock);
 $("code").addEventListener("keydown", e=>{ if(e.key==="Enter") tryUnlock(); });
+$("renamelink").addEventListener("click", e=>{ e.preventDefault(); buildWhoGrid(); show("who"); });
 
-/* リロードしても解錠状態を維持(同じ端末・同じセッション内) */
-(function restore(){
-  const saved = sessionStorage.getItem("sekigime_code");
-  if(saved === CONFIG.CODE){
-    tables = drawTables(saved);
-    if(tables){ buildNameGrid(); show("pick"); }
-  }
-})();
-
-/* --- 名前えらび --- */
-function buildNameGrid(filter=""){
-  const grid = $("namegrid");
-  grid.innerHTML = "";
-  CONFIG.GUESTS
-    .filter(p => p.n.replace(/\s/g,"").includes(filter.replace(/\s/g,"")))
-    .forEach(p=>{
-      const b = document.createElement("button");
-      b.className = "namebtn";
-      b.textContent = p.n;
-      b.addEventListener("click", ()=> startRoll(p.n));
-      grid.appendChild(b);
-    });
+/* --- サーバー連携: 幹事の解禁を数秒ごとに確認+フライング通報 --- */
+let pollTimer = null;
+function startPolling(){
+  if(!CONFIG.SERVER || pollTimer) return;
+  const check = async ()=>{
+    if(!$("lock").classList.contains("on")) return;
+    try{
+      const r = await fetch(CONFIG.SERVER + "/state");
+      const s = await r.json();
+      if(s.unlocked) doUnlock();
+    }catch(e){ /* 圏外などは黙って次の周回へ。予備のコード入力が常に使える */ }
+  };
+  check();
+  pollTimer = setInterval(check, 5000);
 }
-$("namefilter").addEventListener("input", e=> buildNameGrid(e.target.value));
+function stopPolling(){ if(pollTimer){ clearInterval(pollTimer); pollTimer = null; } }
+function reportAttempt(){
+  if(!CONFIG.SERVER) return;
+  fetch(CONFIG.SERVER + "/attempt", {
+    method:"POST", headers:{"content-type":"application/json"},
+    body: JSON.stringify({ name: getMe() || "名無し" }),
+  }).catch(()=>{});
+}
+
+/* --- 起動時の振り分け --- */
+(function boot(){
+  if(sessionStorage.getItem("sekigime_code") === CONFIG.CODE){
+    tables = drawTables(CONFIG.CODE);   // リロードしても解錠状態を維持
+  }
+  const me = getMe();
+  if(!me){ buildWhoGrid(); show("who"); return; }
+  if(tables){ startRoll(me); }
+  else{ enterLock(); }
+})();
 
 /* --- スロット演出 → 結果 --- */
 function tableOf(name){
@@ -478,6 +594,7 @@ function tableOf(name){
 }
 function startRoll(name){
   const t = tableOf(name);
+  if(t < 0){ buildNameGrid(); show("pick"); return; }  // 名簿変更で名前が消えた場合
   $("rollname").textContent = name + " さん";
   show("roll");
   const slot = $("slotnum");
@@ -528,8 +645,97 @@ function buildAllTables(){
 }
 $("allbtn1").addEventListener("click", ()=>{ buildAllTables(); show("all"); });
 $("allbtn2").addEventListener("click", ()=>{ buildAllTables(); show("all"); });
-$("backbtn").addEventListener("click", ()=> show("pick"));
-$("backbtn2").addEventListener("click", ()=> show("pick"));
+$("backbtn").addEventListener("click", ()=>{ buildNameGrid(); show("pick"); });
+$("backbtn2").addEventListener("click", ()=>{ buildNameGrid(); show("pick"); });
+
+/* --- 幹事コンソール --- */
+let adminPin = null, adminTimer = null;
+$("adminlink").addEventListener("click", e=>{ e.preventDefault(); show("admin"); });
+
+async function adminLogin(){
+  const pin = $("adminpin").value.trim();
+  if(!CONFIG.SERVER){
+    $("adminmsg").textContent = "⚠️ SERVER未設定(単独モード)。コードの口頭発表で運用してください";
+    return;
+  }
+  try{
+    const r = await fetch(`${CONFIG.SERVER}/attempts?pin=${encodeURIComponent(pin)}`);
+    if(!r.ok){ $("adminmsg").textContent = "PINが違います"; return; }
+    adminPin = pin;
+    $("adminlogin").style.display = "none";
+    $("adminmain").style.display = "block";
+    $("adminresetbtn").style.display = "";
+    renderAdmin(await r.json());
+    adminTimer = setInterval(refreshAdmin, 5000);
+  }catch(e){ $("adminmsg").textContent = "サーバーに接続できません"; }
+}
+$("adminloginbtn").addEventListener("click", adminLogin);
+$("adminpin").addEventListener("keydown", e=>{ if(e.key==="Enter") adminLogin(); });
+
+async function refreshAdmin(){
+  if(!$("admin").classList.contains("on") || adminPin === null) return;
+  try{
+    const r = await fetch(`${CONFIG.SERVER}/attempts?pin=${encodeURIComponent(adminPin)}`);
+    if(r.ok) renderAdmin(await r.json());
+  }catch(e){}
+}
+function renderAdmin(data){
+  $("adminstate").textContent = data.unlocked
+    ? "状態: 解禁済み 🔓(全員の画面が開いています)"
+    : "状態: 封印中 ☠️ — ボタンで全員一斉に解禁";
+  $("unlockallbtn").disabled = data.unlocked;
+  $("unlockallbtn").textContent = data.unlocked ? "🔓 解禁済み" : "🔓 全員の封印を解く";
+  const list = $("attemptlist");
+  if(!data.attempts.length){
+    list.innerHTML = `<p class="attempt-empty">✅ まだ誰もフライングしていません</p>`;
+    return;
+  }
+  list.innerHTML = "";
+  data.attempts.forEach(a=>{
+    const row = document.createElement("div");
+    row.className = "attempt-row";
+    const n = document.createElement("span"); n.textContent = a.name;
+    const t = document.createElement("span"); t.className = "t"; t.textContent = fmtTime(a.ts);
+    row.append(n, t);
+    list.append(row);
+  });
+}
+$("unlockallbtn").addEventListener("click", async ()=>{
+  try{
+    await fetch(CONFIG.SERVER + "/unlock", {
+      method:"POST", headers:{"content-type":"application/json"},
+      body: JSON.stringify({ pin: adminPin }),
+    });
+    refreshAdmin();
+    burstConfetti(200);
+  }catch(e){ $("adminstate").textContent = "⚠️ 解禁に失敗。電波を確認してもう一度"; }
+});
+let resetArmed = false;
+$("adminresetbtn").addEventListener("click", async ()=>{
+  if(!resetArmed){
+    resetArmed = true;
+    $("adminresetbtn").textContent = "本当にリセットする(もう一度押す)";
+    setTimeout(()=>{ resetArmed = false; $("adminresetbtn").textContent = "リセット(リハーサル用)"; }, 4000);
+    return;
+  }
+  resetArmed = false;
+  $("adminresetbtn").textContent = "リセット(リハーサル用)";
+  await fetch(CONFIG.SERVER + "/reset", {
+    method:"POST", headers:{"content-type":"application/json"},
+    body: JSON.stringify({ pin: adminPin }),
+  }).catch(()=>{});
+  sessionStorage.removeItem("sekigime_code");
+  refreshAdmin();
+});
+$("adminbackbtn").addEventListener("click", ()=>{
+  if(adminTimer){ clearInterval(adminTimer); adminTimer = null; }
+  adminPin = null;
+  $("adminlogin").style.display = "";
+  $("adminmain").style.display = "none";
+  $("adminresetbtn").style.display = "none";
+  $("adminpin").value = ""; $("adminmsg").textContent = "";
+  enterLock();
+});
 
 /* --- 紙吹雪 --- */
 const cvs = $("confetti"), ctx = cvs.getContext("2d");
