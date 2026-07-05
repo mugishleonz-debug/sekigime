@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>席決めの儀 ☠️</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<style>
+  :root{
+    --ink:#0b0a08;
+    --ink2:#151310;
+    --bone:#f2ead8;
+    --bone-dim:#b8ad93;
+    --hazard:#f5c518;
+    --blood:#e0483e;
+    --gold:#e8b64c;
+    --party:#ff5d8f;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--ink);
+    color:var(--bone);
+    font-family:"Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic",sans-serif;
+    min-height:100dvh;
+    overflow-x:hidden;
+  }
+  /* ==== atmosphere ==== */
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:
+      radial-gradient(60% 45% at 50% 0%, rgba(245,197,24,.07), transparent 70%),
+      radial-gradient(80% 60% at 50% 110%, rgba(224,72,62,.08), transparent 70%);
+  }
+  body::after{ /* grain */
+    content:"";position:fixed;inset:-50%;pointer-events:none;z-index:0;opacity:.05;
+    background-image:repeating-conic-gradient(#fff 0 .0001%, transparent 0 .0003%);
+    background-size:11px 11px;
+  }
+  #app{position:relative;z-index:1;max-width:520px;margin:0 auto;padding:0 20px 60px;min-height:100dvh}
+  .screen{display:none;animation:fadein .5s ease both}
+  .screen.on{display:block}
+  @keyframes fadein{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+  /* ==== hazard tape ==== */
+  .tape{
+    position:fixed;left:0;right:0;height:26px;z-index:2;
+    background:repeating-linear-gradient(-45deg,var(--hazard) 0 18px,var(--ink) 18px 36px);
+    box-shadow:0 0 24px rgba(0,0,0,.8);
+  }
+  .tape.top{top:0;transform:rotate(-1.2deg) scaleX(1.05)}
+  .tape.bottom{bottom:0;transform:rotate(1.2deg) scaleX(1.05)}
+  .tape span{
+    display:block;text-align:center;font-weight:800;font-size:11px;letter-spacing:.35em;
+    color:var(--ink);line-height:26px;
+    background:var(--hazard);width:60%;margin:0 auto;
+  }
+
+  /* ==== lock screen ==== */
+  #lock{padding-top:70px;text-align:center}
+  .skull{
+    font-size:110px;line-height:1;margin:26px 0 6px;display:inline-block;
+    filter:drop-shadow(0 0 22px rgba(245,197,24,.35));
+    animation:breathe 3.2s ease-in-out infinite;
+  }
+  @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+  .skull.angry{animation:rage .45s ease}
+  @keyframes rage{
+    0%,100%{transform:translateX(0) rotate(0)}
+    20%{transform:translateX(-12px) rotate(-8deg)}
+    40%{transform:translateX(12px) rotate(8deg)}
+    60%{transform:translateX(-9px) rotate(-5deg)}
+    80%{transform:translateX(9px) rotate(5deg)}
+  }
+  h1{
+    font-size:26px;font-weight:900;letter-spacing:.14em;margin:8px 0 4px;
+  }
+  .warn-line{
+    margin:20px auto 6px;max-width:340px;
+    font-size:17px;font-weight:800;line-height:1.9;
+    color:var(--bone);
+  }
+  .warn-line em{color:var(--hazard);font-style:normal}
+  .sub{color:var(--bone-dim);font-size:13px;line-height:1.9;margin-bottom:26px}
+  .skullmsg{
+    min-height:44px;font-size:14px;font-weight:700;color:var(--blood);
+    display:flex;align-items:center;justify-content:center;padding:0 10px;
+  }
+  .codebox{display:flex;gap:10px;justify-content:center;margin:8px 0 40px}
+  input[type=tel]{
+    width:180px;padding:14px 16px;font-size:26px;letter-spacing:.4em;text-align:center;
+    font-weight:900;color:var(--bone);
+    background:var(--ink2);border:2px solid #3a352b;border-radius:12px;outline:none;
+  }
+  input[type=tel]:focus{border-color:var(--hazard);box-shadow:0 0 0 3px rgba(245,197,24,.18)}
+  .btn{
+    appearance:none;border:none;cursor:pointer;border-radius:12px;
+    font-family:inherit;font-weight:900;letter-spacing:.1em;
+    transition:transform .08s ease, filter .2s ease;
+  }
+  .btn:active{transform:scale(.96)}
+  .btn-hazard{
+    padding:14px 22px;font-size:16px;color:var(--ink);
+    background:var(--hazard);
+    box-shadow:0 6px 0 #8a6d05;
+  }
+  .btn-ghost{
+    padding:12px 18px;font-size:14px;color:var(--bone-dim);
+    background:transparent;border:1.5px solid #3a352b;
+  }
+  .btn-gold{
+    padding:14px 22px;font-size:16px;color:var(--ink);
+    background:linear-gradient(180deg,#f6d98a,var(--gold));
+    box-shadow:0 6px 0 #7d5a14;
+  }
+
+  /* ==== pick screen ==== */
+  #pick{padding-top:56px}
+  .kaikin{
+    text-align:center;font-size:34px;font-weight:900;letter-spacing:.2em;
+    color:var(--gold);margin:10px 0 2px;
+    text-shadow:0 0 30px rgba(232,182,76,.4);
+  }
+  .pick-sub{text-align:center;color:var(--bone-dim);font-size:14px;margin-bottom:18px}
+  #namefilter{
+    width:100%;padding:12px 16px;font-size:16px;color:var(--bone);
+    background:var(--ink2);border:2px solid #3a352b;border-radius:12px;outline:none;margin-bottom:14px;
+    font-family:inherit;
+  }
+  #namefilter:focus{border-color:var(--gold)}
+  .namegrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .namebtn{
+    padding:14px 8px;font-size:15px;font-weight:700;color:var(--bone);
+    background:var(--ink2);border:1.5px solid #35301f;border-radius:12px;cursor:pointer;
+    font-family:inherit;transition:transform .08s ease,border-color .2s;
+  }
+  .namebtn:active{transform:scale(.95);border-color:var(--gold)}
+  .toolrow{display:flex;justify-content:center;gap:12px;margin:22px 0 0}
+
+  /* ==== roll screen ==== */
+  #roll{padding-top:120px;text-align:center}
+  .roll-name{font-size:18px;font-weight:800;color:var(--bone-dim);letter-spacing:.1em}
+  .slot{
+    font-size:120px;font-weight:900;line-height:1.1;margin:20px 0;
+    color:var(--gold);font-variant-numeric:tabular-nums;
+    text-shadow:0 0 40px rgba(232,182,76,.45);
+  }
+  .roll-label{font-size:16px;letter-spacing:.5em;color:var(--bone-dim)}
+
+  /* ==== reveal screen ==== */
+  #reveal{padding-top:64px;text-align:center}
+  .rev-name{font-size:20px;font-weight:800;margin-bottom:6px}
+  .rev-label{font-size:13px;letter-spacing:.4em;color:var(--bone-dim)}
+  .rev-table{
+    font-size:150px;font-weight:900;line-height:1;margin:6px 0 2px;
+    background:linear-gradient(180deg,#ffe9ad,var(--gold) 60%,#a97b1e);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 4px 24px rgba(232,182,76,.35));
+    animation:pop .5s cubic-bezier(.2,2,.4,1) both;
+  }
+  @keyframes pop{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
+  .rev-taku{font-size:26px;font-weight:900;letter-spacing:.3em;color:var(--gold);margin-bottom:22px}
+  .mates{
+    background:var(--ink2);border:1.5px solid #35301f;border-radius:16px;
+    padding:16px 18px;margin:0 0 24px;text-align:left;
+  }
+  .mates h3{margin:0 0 10px;font-size:12px;letter-spacing:.3em;color:var(--bone-dim);text-align:center}
+  .mates ul{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .mates li{font-size:15px;font-weight:700;padding:6px 10px;background:#1e1a13;border-radius:8px;text-align:center}
+  .mates li.me{color:var(--ink);background:var(--gold)}
+
+  /* ==== all tables ==== */
+  #all{padding-top:56px}
+  .all-title{text-align:center;font-size:22px;font-weight:900;letter-spacing:.2em;color:var(--gold);margin-bottom:18px}
+  .tablecard{
+    background:var(--ink2);border:1.5px solid #35301f;border-radius:16px;
+    padding:14px 16px;margin-bottom:12px;
+  }
+  .tablecard h3{
+    margin:0 0 8px;font-size:15px;font-weight:900;color:var(--gold);letter-spacing:.15em;
+    display:flex;align-items:center;gap:8px;
+  }
+  .tablecard ul{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:6px}
+  .tablecard li{font-size:14px;font-weight:700;padding:5px 12px;background:#1e1a13;border-radius:999px}
+
+  canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:5}
+  .center{text-align:center}
+  .config-error{padding:100px 10px;text-align:center;color:var(--blood);font-weight:800;line-height:2}
+</style>
+</head>
+<body>
+
+<div class="tape top"><span>KEEP OUT — 開封厳禁 — KEEP OUT</span></div>
+<div class="tape bottom"><span>KEEP OUT — 開封厳禁 — KEEP OUT</span></div>
+<canvas id="confetti"></canvas>
+
+<div id="app">
+
+  <!-- ①ドクロのロック画面 -->
+  <section class="screen on" id="lock">
+    <div class="skull" id="skull">☠️</div>
+    <h1>席決めの儀</h1>
+    <p class="warn-line">幹事がボタンを押すまでは<br><em>まだ開くな</em>って言ったよな…？</p>
+    <p class="sub">幹事の合図で「解禁コード」が発表される。<br>それまでこの封印は解けない。</p>
+    <div class="skullmsg" id="skullmsg"></div>
+    <div class="codebox">
+      <input type="tel" id="code" maxlength="4" placeholder="0000" autocomplete="off">
+      <button class="btn btn-hazard" id="unlockbtn">解錠</button>
+    </div>
+  </section>
+
+  <!-- ②名前えらび -->
+  <section class="screen" id="pick">
+    <div class="kaikin">🎉 解禁 🎉</div>
+    <p class="pick-sub">自分の名前を選ぶと、運命の卓が判明します</p>
+    <input id="namefilter" type="text" placeholder="名前で検索…" autocomplete="off">
+    <div class="namegrid" id="namegrid"></div>
+    <div class="toolrow">
+      <button class="btn btn-ghost" id="allbtn1">全卓一覧を見る</button>
+    </div>
+  </section>
+
+  <!-- ③スロット演出 -->
+  <section class="screen" id="roll">
+    <p class="roll-name" id="rollname"></p>
+    <div class="slot" id="slotnum">?</div>
+    <p class="roll-label">運命抽選中</p>
+  </section>
+
+  <!-- ④結果 -->
+  <section class="screen" id="reveal">
+    <p class="rev-name" id="revname"></p>
+    <p class="rev-label">YOUR TABLE</p>
+    <div class="rev-table" id="revnum">1</div>
+    <p class="rev-taku" id="revtaku">1 卓</p>
+    <div class="mates">
+      <h3>同じ卓の仲間</h3>
+      <ul id="mates"></ul>
+    </div>
+    <div class="toolrow">
+      <button class="btn btn-ghost" id="backbtn">名前を選び直す</button>
+      <button class="btn btn-gold" id="allbtn2">全卓一覧</button>
+    </div>
+  </section>
+
+  <!-- ⑤全卓一覧(幹事・電池切れ救済用) -->
+  <section class="screen" id="all">
+    <div class="all-title">— 全卓一覧 —</div>
+    <div id="tablelist"></div>
+    <div class="toolrow">
+      <button class="btn btn-ghost" id="backbtn2">もどる</button>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* ================================================================
+   ★★★ 幹事が編集するのはここだけ ★★★
+   ---------------------------------------------------------------
+   CODE   : 解禁コード(4桁)。当日マイクで発表するまで秘密。
+            ※コードを変えると抽選結果も変わります。
+   GUESTS : ゲスト40名。g は "M"(男性) / "F"(女性)。
+            「女性だけの卓」ができないように内部で使うだけで、
+            画面には表示されません。
+   ================================================================ */
+const CONFIG = {
+  CODE: "0705",
+  TABLES: 8,
+  SEATS: 5,
+  GUESTS: [
+    {n:"佐藤 健太",  g:"M"}, {n:"鈴木 美咲",  g:"F"},
+    {n:"高橋 大輔",  g:"M"}, {n:"田中 由紀",  g:"F"},
+    {n:"伊藤 翔太",  g:"M"}, {n:"渡辺 彩香",  g:"F"},
+    {n:"山本 拓也",  g:"M"}, {n:"中村 千夏",  g:"F"},
+    {n:"小林 亮",    g:"M"}, {n:"加藤 真央",  g:"F"},
+    {n:"吉田 悠人",  g:"M"}, {n:"山田 沙織",  g:"F"},
+    {n:"佐々木 蓮",  g:"M"}, {n:"山口 恵里",  g:"F"},
+    {n:"松本 一樹",  g:"M"}, {n:"井上 菜々",  g:"F"},
+    {n:"木村 俊介",  g:"M"}, {n:"林 美穂",    g:"F"},
+    {n:"斎藤 貴之",  g:"M"}, {n:"清水 楓",    g:"F"},
+    {n:"山崎 直人",  g:"M"}, {n:"森 亜美",    g:"F"},
+    {n:"池田 圭吾",  g:"M"}, {n:"橋本 里奈",  g:"F"},
+    {n:"阿部 慎二",  g:"M"}, {n:"石川 遥",    g:"F"},
+    {n:"中島 剛",    g:"M"}, {n:"前田 詩織",  g:"F"},
+    {n:"藤田 淳",    g:"M"}, {n:"後藤 明日香",g:"F"},
+    {n:"岡田 光",    g:"M"}, {n:"長谷川 舞",  g:"F"},
+    {n:"村上 竜也",  g:"M"}, {n:"近藤 早紀",  g:"F"},
+    {n:"石井 智也",  g:"M"}, {n:"坂本 香奈",  g:"F"},
+    {n:"遠藤 勇気",  g:"M"}, {n:"青木 未来",  g:"F"},
+    {n:"西村 徹",    g:"M"}, {n:"福田 のぞみ",g:"F"},
+  ],
+};
+/* ================================================================ */
+
+/* ---- シード付き乱数(全スマホで同じ結果を再現するための心臓部) ---- */
+function xmur3(str){
+  let h = 1779033703 ^ str.length;
+  for(let i=0;i<str.length;i++){
+    h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+    h = (h << 13) | (h >>> 19);
+  }
+  return ()=>{ h = Math.imul(h ^ (h>>>16), 2246822507);
+               h = Math.imul(h ^ (h>>>13), 3266489909);
+               return (h ^= h>>>16) >>> 0; };
+}
+function mulberry32(a){
+  return ()=>{ a |= 0; a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a>>>15), 1 | a);
+    t = (t + Math.imul(t ^ (t>>>7), 61 | t)) ^ t;
+    return ((t ^ (t>>>14)) >>> 0) / 4294967296; };
+}
+
+/* ---- 抽選本体:女性だけの卓ができたら自動で引き直す(決定論的) ---- */
+function drawTables(code){
+  for(let salt=0; salt<5000; salt++){
+    const rand = mulberry32(xmur3(code + "#" + salt)());
+    const pool = CONFIG.GUESTS.slice();
+    for(let i=pool.length-1;i>0;i--){           // Fisher–Yates
+      const j = Math.floor(rand()*(i+1));
+      [pool[i],pool[j]] = [pool[j],pool[i]];
+    }
+    const tables = [];
+    for(let t=0;t<CONFIG.TABLES;t++)
+      tables.push(pool.slice(t*CONFIG.SEATS,(t+1)*CONFIG.SEATS));
+    const ok = tables.every(tab => tab.some(p => p.g === "M"));
+    if(ok) return tables;
+  }
+  return null; // 男性が7人以下などで制約を満たせない場合
+}
+
+/* ---- 画面まわり ---- */
+const $ = id => document.getElementById(id);
+let tables = null;
+
+function show(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("on"));
+  $(id).classList.add("on");
+  window.scrollTo(0,0);
+}
+
+/* 設定ミスの検知 */
+(function validate(){
+  const total = CONFIG.TABLES * CONFIG.SEATS;
+  if(CONFIG.GUESTS.length !== total){
+    $("app").innerHTML = `<div class="config-error">⚠️ 設定エラー<br>ゲストが ${CONFIG.GUESTS.length} 名ですが、${CONFIG.TABLES}卓 × ${CONFIG.SEATS}席 = ${total} 名が必要です。<br>CONFIG.GUESTS を確認してください。</div>`;
+  }
+})();
+
+/* --- ロック画面 --- */
+const angryLines = [
+  "…違うな。まだその時ではない。",
+  "おいおい、幹事の合図はあったのか？",
+  "フライングは新郎新婦が悲しむぞ ☠️",
+  "諦めろ。乾杯の後にまた会おう。",
+  "……しつこい奴は末席の刑だぞ。",
+];
+let wrongCount = 0;
+
+function tryUnlock(){
+  const v = $("code").value.trim();
+  if(v === CONFIG.CODE){
+    tables = drawTables(CONFIG.CODE);
+    if(!tables){
+      $("skullmsg").textContent = "⚠️ 男性が少なすぎて『女性だけの卓を作らない』条件を満たせません";
+      return;
+    }
+    sessionStorage.setItem("sekigime_code", v);
+    buildNameGrid();
+    show("pick");
+    burstConfetti(140);
+  }else{
+    const s = $("skull");
+    s.classList.remove("angry"); void s.offsetWidth; s.classList.add("angry");
+    $("skullmsg").textContent = angryLines[Math.min(wrongCount, angryLines.length-1)];
+    wrongCount++;
+    $("code").value = "";
+  }
+}
+$("unlockbtn").addEventListener("click", tryUnlock);
+$("code").addEventListener("keydown", e=>{ if(e.key==="Enter") tryUnlock(); });
+
+/* リロードしても解錠状態を維持(同じ端末・同じセッション内) */
+(function restore(){
+  const saved = sessionStorage.getItem("sekigime_code");
+  if(saved === CONFIG.CODE){
+    tables = drawTables(saved);
+    if(tables){ buildNameGrid(); show("pick"); }
+  }
+})();
+
+/* --- 名前えらび --- */
+function buildNameGrid(filter=""){
+  const grid = $("namegrid");
+  grid.innerHTML = "";
+  CONFIG.GUESTS
+    .filter(p => p.n.replace(/\s/g,"").includes(filter.replace(/\s/g,"")))
+    .forEach(p=>{
+      const b = document.createElement("button");
+      b.className = "namebtn";
+      b.textContent = p.n;
+      b.addEventListener("click", ()=> startRoll(p.n));
+      grid.appendChild(b);
+    });
+}
+$("namefilter").addEventListener("input", e=> buildNameGrid(e.target.value));
+
+/* --- スロット演出 → 結果 --- */
+function tableOf(name){
+  for(let t=0;t<tables.length;t++)
+    if(tables[t].some(p=>p.n===name)) return t;
+  return -1;
+}
+function startRoll(name){
+  const t = tableOf(name);
+  $("rollname").textContent = name + " さん";
+  show("roll");
+  const slot = $("slotnum");
+  let ticks = 0;
+  const iv = setInterval(()=>{
+    slot.textContent = 1 + Math.floor(Math.random()*CONFIG.TABLES);
+    ticks++;
+    if(ticks > 22){
+      clearInterval(iv);
+      revealResult(name, t);
+    }
+  }, 80 + ticks);
+  navigator.vibrate && navigator.vibrate([30,50,30]);
+}
+function revealResult(name, t){
+  $("revname").textContent = name + " さん";
+  $("revnum").textContent = t+1;
+  $("revtaku").textContent = (t+1) + " 卓";
+  const ul = $("mates"); ul.innerHTML = "";
+  tables[t].forEach(p=>{
+    const li = document.createElement("li");
+    li.textContent = p.n;
+    if(p.n === name) li.classList.add("me");
+    ul.appendChild(li);
+  });
+  show("reveal");
+  burstConfetti(220);
+  navigator.vibrate && navigator.vibrate(120);
+}
+
+/* --- 全卓一覧(電池切れの人の救済にも:誰のスマホでも全員分見られる) --- */
+function buildAllTables(){
+  const wrap = $("tablelist"); wrap.innerHTML = "";
+  tables.forEach((tab,i)=>{
+    const card = document.createElement("div");
+    card.className = "tablecard";
+    card.innerHTML = `<h3>🍾 ${i+1} 卓</h3>`;
+    const ul = document.createElement("ul");
+    tab.forEach(p=>{
+      const li = document.createElement("li");
+      li.textContent = p.n;
+      ul.appendChild(li);
+    });
+    card.appendChild(ul);
+    wrap.appendChild(card);
+  });
+}
+$("allbtn1").addEventListener("click", ()=>{ buildAllTables(); show("all"); });
+$("allbtn2").addEventListener("click", ()=>{ buildAllTables(); show("all"); });
+$("backbtn").addEventListener("click", ()=> show("pick"));
+$("backbtn2").addEventListener("click", ()=> show("pick"));
+
+/* --- 紙吹雪 --- */
+const cvs = $("confetti"), ctx = cvs.getContext("2d");
+let parts = [], rafId = null;
+function sizeCanvas(){ cvs.width = innerWidth; cvs.height = innerHeight; }
+addEventListener("resize", sizeCanvas); sizeCanvas();
+const COLORS = ["#e8b64c","#f2ead8","#ff5d8f","#7ec8e3","#b7e07a"];
+function burstConfetti(n){
+  for(let i=0;i<n;i++){
+    parts.push({
+      x: Math.random()*cvs.width, y: -20 - Math.random()*cvs.height*.3,
+      w: 6+Math.random()*6, h: 8+Math.random()*8,
+      vy: 2+Math.random()*3.5, vx: -1.5+Math.random()*3,
+      rot: Math.random()*Math.PI, vr: -.15+Math.random()*.3,
+      c: COLORS[i%COLORS.length],
+    });
+  }
+  if(!rafId) tick();
+}
+function tick(){
+  ctx.clearRect(0,0,cvs.width,cvs.height);
+  parts = parts.filter(p=>p.y < cvs.height+20);
+  parts.forEach(p=>{
+    p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr;
+    ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot);
+    ctx.fillStyle=p.c; ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); ctx.restore();
+  });
+  rafId = parts.length ? requestAnimationFrame(tick) : null;
+}
+</script>
+</body>
+</html>
