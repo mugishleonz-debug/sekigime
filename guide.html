@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>使い方ガイド | 席決めの儀 ☠️</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root{
+    --paper:#fffdf7;
+    --ink:#2a2620;
+    --dim:#6f6858;
+    --hazard:#f5c518;
+    --hazard-dark:#8a6d05;
+    --gold:#b8860b;
+    --blood:#c0392b;
+    --line:#e8e2d2;
+    --card:#faf7ee;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:"Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic",sans-serif;
+    line-height:1.9;
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:0 22px 80px}
+  header{
+    background:#141210;color:#f2ead8;text-align:center;
+    padding:44px 20px 38px;margin-bottom:40px;
+    border-bottom:8px solid var(--hazard);
+  }
+  header .skull{font-size:56px;line-height:1}
+  header h1{font-size:26px;font-weight:900;letter-spacing:.15em;margin:10px 0 4px}
+  header p{color:#b8ad93;font-size:14px;margin:0}
+  h2{
+    font-size:20px;font-weight:900;letter-spacing:.08em;
+    border-left:8px solid var(--hazard);padding:2px 0 2px 14px;
+    margin:56px 0 8px;
+  }
+  h2 .en{font-size:11px;color:var(--dim);letter-spacing:.3em;display:block;font-weight:700}
+  .lead{color:var(--dim);font-size:14px;margin:0 0 24px}
+
+  .step{
+    display:flex;gap:20px;align-items:flex-start;
+    padding:22px 0;border-bottom:1.5px dashed var(--line);
+  }
+  .step:last-of-type{border-bottom:none}
+  .stepnum{
+    flex:0 0 44px;height:44px;border-radius:50%;
+    background:var(--hazard);color:#141210;
+    display:flex;align-items:center;justify-content:center;
+    font-size:20px;font-weight:900;margin-top:4px;
+  }
+  .steptext h3{margin:6px 0 6px;font-size:17px;font-weight:900}
+  .steptext p{margin:0 0 8px;font-size:15px}
+  .steptext .note{font-size:13px;color:var(--dim)}
+  .shot{
+    display:block;width:min(250px,70vw);margin:14px 0 4px;
+    border-radius:22px;border:5px solid #141210;
+    box-shadow:0 10px 30px rgba(20,18,16,.25);
+  }
+  .shots2{display:flex;gap:16px;flex-wrap:wrap}
+  .shots2 figure{margin:14px 0 4px}
+  .shots2 .shot{margin:0}
+  figcaption{font-size:12px;color:var(--dim);text-align:center;margin-top:6px}
+
+  .callout{
+    background:var(--card);border:1.5px solid var(--line);border-radius:14px;
+    padding:18px 20px;margin:20px 0;font-size:14.5px;
+  }
+  .callout.warn{border-color:#f0c9c4;background:#fdf3f1}
+  .callout b.title{display:block;font-size:15px;margin-bottom:6px}
+  .callout.warn b.title{color:var(--blood)}
+  ul{padding-left:22px;margin:8px 0}
+  li{margin-bottom:6px;font-size:14.5px}
+  .qa dt{font-weight:900;font-size:15px;margin-top:18px}
+  .qa dt::before{content:"Q. ";color:var(--gold)}
+  .qa dd{margin:4px 0 0 0;font-size:14.5px}
+  .qa dd::before{content:"A. ";color:var(--blood);font-weight:900}
+  .pill{
+    display:inline-block;background:#141210;color:var(--hazard);
+    font-size:12px;font-weight:900;letter-spacing:.1em;
+    padding:3px 12px;border-radius:999px;margin-right:6px;
+  }
+  code{
+    background:var(--card);border:1px solid var(--line);border-radius:6px;
+    padding:2px 8px;font-size:13.5px;
+  }
+  footer{
+    text-align:center;color:var(--dim);font-size:12px;
+    margin-top:70px;padding-top:20px;border-top:1.5px solid var(--line);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="skull">☠️</div>
+  <h1>「席決めの儀」使い方ガイド</h1>
+  <p>結婚式二次会・席決め抽選アプリ — ゲストも幹事もこれ1枚でOK</p>
+</header>
+
+<div class="wrap">
+
+  <h2><span class="en">ABOUT</span>これは何?</h2>
+  <p class="lead">全員のスマホで同時に席の抽選結果がわかるアプリです。幹事がOKを出すまでは、ドクロの封印がかかっていて誰も結果を見られません。</p>
+  <div class="callout">
+    <b class="title">🎲 抽選のしくみ(安心ポイント)</b>
+    結果はサーバーに保存されるのではなく、全員のスマホの中で同じ計算式から生まれます。だから<b>いつ開いても・誰のスマホで見ても、必ず同じ結果</b>。遅刻しても電池が切れても、席がなくなることはありません。女性だけの卓ができないよう自動で調整されます。
+  </div>
+
+  <h2><span class="en">FOR GUESTS</span>ゲストのつかいかた(4ステップ)</h2>
+  <p class="lead">やることは「開いて、名乗って、待つ」だけです。</p>
+
+  <div class="step">
+    <div class="stepnum">1</div>
+    <div class="steptext">
+      <h3>招待QRコード(またはURL)をスマホで開く</h3>
+      <p>最初に <b>自分の名前</b> を一覧から選びます。検索欄に名前の一部を入れるとすぐ見つかります。</p>
+      <p class="note">⚠️ 他人の名前を選ぶのはやめましょう。フライング通報がその人の名前で記録されてしまいます(=罰が下ります)。</p>
+      <img class="shot" src="img/1_who.png" alt="名前を選ぶ画面">
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="stepnum">2</div>
+    <div class="steptext">
+      <h3>ドクロの封印画面のまま、幹事の合図を待つ</h3>
+      <p>この画面が出たら準備完了。<b>何もしなくてOK</b>です。幹事がボタンを押すと、封印はひとりでに解けます。</p>
+      <img class="shot" src="img/2_lock.png" alt="ドクロの封印画面">
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="stepnum">3</div>
+    <div class="steptext">
+      <h3>先に開けようとすると……</h3>
+      <p>コードを当てずっぽうで入れると、ドクロが怒ります。そして<b>その試みは名前つきで幹事に通報され、結果画面に「検挙スタンプ」が押されます</b>。罰ゲームが待っています。</p>
+      <div class="shots2">
+        <figure>
+          <img class="shot" src="img/3_lock_angry.png" alt="ドクロが怒った画面">
+          <figcaption>フライングを試みた瞬間</figcaption>
+        </figure>
+        <figure>
+          <img class="shot" src="img/5_reveal_stamp.png" alt="検挙スタンプつきの結果画面">
+          <figcaption>結果画面に検挙スタンプ…</figcaption>
+        </figure>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="stepnum">4</div>
+    <div class="steptext">
+      <h3>解禁!スロットが回って運命の卓が判明</h3>
+      <p>幹事がOKを出すと自動でスロット演出がはじまり、あなたの卓番号と「同じ卓の仲間」が表示されます。</p>
+      <div class="shots2">
+        <figure>
+          <img class="shot" src="img/4_roll.png" alt="スロット演出">
+          <figcaption>運命抽選中…</figcaption>
+        </figure>
+        <figure>
+          <img class="shot" src="img/5_reveal.png" alt="結果画面">
+          <figcaption>フライングしなかった人には「良い子の証」</figcaption>
+        </figure>
+      </div>
+    </div>
+  </div>
+
+  <h2><span class="en">TROUBLE</span>困ったときは</h2>
+  <dl class="qa">
+    <dt>スマホの電池が切れた!</dt>
+    <dd>となりの人の画面で「全卓一覧」ボタンを押してもらえば、全員の席が見られます。結果は誰のスマホでも同じなので大丈夫。幹事の端末でも確認できます。</dd>
+    <dt>遅刻してまだ会場に着いていない…</dt>
+    <dd>問題ありません。何時に開いても同じ結果が出ます。着いたらURLを開くだけです。</dd>
+    <dt>名前をまちがえて選んでしまった</dt>
+    <dd>封印画面の下にある「名前をまちがえた」を押すと選び直せます。</dd>
+    <dt>電波が悪くて自動で解禁されない</dt>
+    <dd>幹事がマイクで発表する「解禁コード」を封印画面に入力すれば開きます(予備の手段です)。</dd>
+  </dl>
+  <img class="shot" src="img/6_all.png" alt="全卓一覧画面">
+  <p class="note" style="font-size:13px;color:var(--dim)">▲「全卓一覧」— 誰のスマホからでも全員分が見られる(電池切れ救済用)</p>
+
+  <h2><span class="en">FOR ORGANIZER</span>幹事のつかいかた</h2>
+
+  <p><span class="pill">事前準備</span></p>
+  <ul>
+    <li><code>index.html</code> の <code>CONFIG</code> にゲスト名簿(名前+性別M/F)を入れる。人数は40名ちょうどでなくてOK(8卓に均等割り)。</li>
+    <li>解禁コード(<code>CODE</code>)を決めておく。<b>当日発表するまで秘密</b>。</li>
+    <li>欠席が出たら、<b>解禁前に</b>名簿から行を消して更新する。</li>
+    <li>URLをQRコードにして受付や招待状に貼っておく。</li>
+  </ul>
+
+  <p><span class="pill">当日</span></p>
+  <div class="step">
+    <div class="stepnum">1</div>
+    <div class="steptext">
+      <h3>幹事コンソールに入る</h3>
+      <p>封印画面の下の「幹事の方はこちら」→ 幹事用PINを入力。</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="stepnum">2</div>
+    <div class="steptext">
+      <h3>タイミングが来たら、赤いボタンをドン!</h3>
+      <p>「🔓 全員の封印を解く」を押すと、数秒以内に会場全員のスマホが一斉にスロット演出をはじめます。マイクで「今だ!スマホを見ろ!」と煽ると盛り上がります。</p>
+      <img class="shot" src="img/7_admin.png" alt="幹事コンソール">
+    </div>
+  </div>
+  <div class="step">
+    <div class="stepnum">3</div>
+    <div class="steptext">
+      <h3>フライング検挙リストで罰ゲーム発表</h3>
+      <p>コンソールには、封印を先に開けようとした人が<b>名前と時刻つき</b>で並んでいます。「山本くん、18時2分。乾杯前だよねぇ?」— 罰ゲームへどうぞ。</p>
+      <p class="note">結果画面のスタンプでも見分けられます:赤い「フライング検挙」=クロ、緑の「良い子の証」=シロ。</p>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <b class="title">⚠️ 幹事のたったひとつの鉄の掟</b>
+    <b>解禁したあとは、名簿も解禁コードも絶対に変更しない</b>こと。変更すると全員の抽選結果が変わってしまい、すでに座った人とズレて大混乱になります。欠席反映などの変更は必ず解禁前に。
+  </div>
+
+  <div class="callout">
+    <b class="title">🔁 リハーサルをしたいとき</b>
+    幹事コンソールの「リセット(リハーサル用)」で封印状態に戻り、検挙リストも消えます。テストで開いてしまった自分のスマホは、タブを閉じて開き直せば封印画面に戻ります。
+  </div>
+
+  <footer>
+    席決めの儀 ☠️ — Powered by 運命 &amp; JavaScript<br>
+    アプリ本体: <a href="./index.html">index.html</a>
+  </footer>
+
+</div>
+</body>
+</html>
