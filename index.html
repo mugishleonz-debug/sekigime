@@ -182,6 +182,26 @@
   .tablecard ul{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:6px}
   .tablecard li{font-size:14px;font-weight:700;padding:5px 12px;background:#1e1a13;border-radius:999px}
 
+  /* ==== フライング記録 ==== */
+  .record-warn{
+    font-size:11.5px;color:#8a6d05;line-height:1.9;margin:-14px 0 20px;
+    letter-spacing:.05em;
+  }
+  .stamp{
+    display:inline-block;margin:0 auto 24px;padding:12px 20px;
+    border:3px solid var(--blood);border-radius:8px;color:var(--blood);
+    font-weight:900;font-size:16px;letter-spacing:.15em;line-height:1.8;
+    transform:rotate(-5deg);
+    box-shadow:0 0 24px rgba(224,72,62,.25), inset 0 0 14px rgba(224,72,62,.12);
+    animation:stamp-in .35s cubic-bezier(.2,2.5,.4,1) .4s both;
+  }
+  .stamp small{display:block;font-size:11px;font-weight:700;letter-spacing:.05em;color:#c07b76}
+  @keyframes stamp-in{from{transform:rotate(-5deg) scale(2.4);opacity:0}to{transform:rotate(-5deg) scale(1);opacity:1}}
+  .clean-badge{
+    display:inline-block;margin:0 auto 24px;padding:8px 18px;border-radius:999px;
+    border:1.5px solid #3f6e4a;color:#8fd6a0;font-size:13px;font-weight:800;letter-spacing:.1em;
+  }
+
   canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:5}
   .center{text-align:center}
   .config-error{padding:100px 10px;text-align:center;color:var(--blood);font-weight:800;line-height:2}
@@ -201,6 +221,7 @@
     <h1>席決めの儀</h1>
     <p class="warn-line">幹事がボタンを押すまでは<br><em>まだ開くな</em>って言ったよな…？</p>
     <p class="sub">幹事の合図で「解禁コード」が発表される。<br>それまでこの封印は解けない。</p>
+    <p class="record-warn">⚠️ 解錠の試みは、すべてこの端末に記録される。<br>記録は抽選結果と一緒に晒される。覚悟しろ。</p>
     <div class="skullmsg" id="skullmsg"></div>
     <div class="codebox">
       <input type="tel" id="code" maxlength="4" placeholder="0000" autocomplete="off">
@@ -236,6 +257,7 @@
       <h3>同じ卓の仲間</h3>
       <ul id="mates"></ul>
     </div>
+    <div id="record"></div>
     <div class="toolrow">
       <button class="btn btn-ghost" id="backbtn">名前を選び直す</button>
       <button class="btn btn-gold" id="allbtn2">全卓一覧</button>
@@ -259,14 +281,17 @@
    ---------------------------------------------------------------
    CODE   : 解禁コード(4桁)。当日マイクで発表するまで秘密。
             ※コードを変えると抽選結果も変わります。
-   GUESTS : ゲスト40名。g は "M"(男性) / "F"(女性)。
+   GUESTS : ゲストの名簿。g は "M"(男性) / "F"(女性)。
             「女性だけの卓」ができないように内部で使うだけで、
             画面には表示されません。
+            人数は40名ちょうどでなくてOK。欠席が出たら行を
+            消すだけで、8卓にできるだけ均等に振り分けます。
+   ※注意: 解禁コードを発表した後に名簿やコードを変更しない
+            こと。全員の抽選結果が変わってしまいます。
    ================================================================ */
 const CONFIG = {
   CODE: "0705",
   TABLES: 8,
-  SEATS: 5,
   GUESTS: [
     {n:"佐藤 健太",  g:"M"}, {n:"鈴木 美咲",  g:"F"},
     {n:"高橋 大輔",  g:"M"}, {n:"田中 由紀",  g:"F"},
@@ -310,8 +335,13 @@ function mulberry32(a){
     return ((t ^ (t>>>14)) >>> 0) / 4294967296; };
 }
 
-/* ---- 抽選本体:女性だけの卓ができたら自動で引き直す(決定論的) ---- */
+/* ---- 抽選本体:女性だけの卓ができたら自動で引き直す(決定論的) ----
+   人数が 8 の倍数でなくても、各卓にできるだけ均等に振り分ける。
+   (例: 39名 → 5名の卓が7つ + 4名の卓が1つ) */
 function drawTables(code){
+  const N = CONFIG.GUESTS.length, T = CONFIG.TABLES;
+  const sizes = [];
+  for(let t=0;t<T;t++) sizes.push(Math.floor(N/T) + (t < N%T ? 1 : 0));
   for(let salt=0; salt<5000; salt++){
     const rand = mulberry32(xmur3(code + "#" + salt)());
     const pool = CONFIG.GUESTS.slice();
@@ -320,8 +350,8 @@ function drawTables(code){
       [pool[i],pool[j]] = [pool[j],pool[i]];
     }
     const tables = [];
-    for(let t=0;t<CONFIG.TABLES;t++)
-      tables.push(pool.slice(t*CONFIG.SEATS,(t+1)*CONFIG.SEATS));
+    let cur = 0;
+    for(const size of sizes){ tables.push(pool.slice(cur, cur+size)); cur += size; }
     const ok = tables.every(tab => tab.some(p => p.g === "M"));
     if(ok) return tables;
   }
@@ -340,11 +370,46 @@ function show(id){
 
 /* 設定ミスの検知 */
 (function validate(){
-  const total = CONFIG.TABLES * CONFIG.SEATS;
-  if(CONFIG.GUESTS.length !== total){
-    $("app").innerHTML = `<div class="config-error">⚠️ 設定エラー<br>ゲストが ${CONFIG.GUESTS.length} 名ですが、${CONFIG.TABLES}卓 × ${CONFIG.SEATS}席 = ${total} 名が必要です。<br>CONFIG.GUESTS を確認してください。</div>`;
+  if(CONFIG.GUESTS.length < CONFIG.TABLES){
+    $("app").innerHTML = `<div class="config-error">⚠️ 設定エラー<br>ゲストが ${CONFIG.GUESTS.length} 名しかいません。${CONFIG.TABLES}卓には最低 ${CONFIG.TABLES} 名が必要です。<br>CONFIG.GUESTS を確認してください。</div>`;
   }
 })();
+
+/* --- フライング記録(本人の端末に証拠を残し、結果画面で晒す) --- */
+const LS_ATTEMPTS = "sekigime_attempts";
+const LS_FIRSTOPEN = "sekigime_firstopen";
+function lsGet(key, fallback){
+  try{ return JSON.parse(localStorage.getItem(key)) ?? fallback; }
+  catch(e){ return fallback; }
+}
+function lsSet(key, val){
+  try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){}
+}
+if(lsGet(LS_FIRSTOPEN, null) === null) lsSet(LS_FIRSTOPEN, Date.now());
+function logAttempt(){
+  const a = lsGet(LS_ATTEMPTS, []);
+  a.push(Date.now());
+  lsSet(LS_ATTEMPTS, a);
+}
+function fmtTime(ms){
+  const d = new Date(ms);
+  return `${d.getHours()}:${String(d.getMinutes()).padStart(2,"0")}`;
+}
+function renderRecord(){
+  const attempts = lsGet(LS_ATTEMPTS, []);
+  const first = lsGet(LS_FIRSTOPEN, null);
+  const box = $("record");
+  if(attempts.length > 0){
+    box.innerHTML =
+      `<div class="stamp">☠️ フライング検挙 ☠️
+        <small>解錠の試み ${attempts.length} 回(最初は ${fmtTime(attempts[0])})<br>
+        初めてページを開いた時刻 ${fmtTime(first)}</small></div>`;
+  }else{
+    box.innerHTML =
+      `<div class="clean-badge">✅ フライングなし・良い子の証
+        <small style="display:block;font-weight:700;color:#5f9c6e">初回アクセス ${fmtTime(first)}</small></div>`;
+  }
+}
 
 /* --- ロック画面 --- */
 const angryLines = [
@@ -369,6 +434,7 @@ function tryUnlock(){
     show("pick");
     burstConfetti(140);
   }else{
+    if(v) logAttempt();   // 動かぬ証拠。結果画面で晒される(空タップは除く)
     const s = $("skull");
     s.classList.remove("angry"); void s.offsetWidth; s.classList.add("angry");
     $("skullmsg").textContent = angryLines[Math.min(wrongCount, angryLines.length-1)];
@@ -437,6 +503,7 @@ function revealResult(name, t){
     if(p.n === name) li.classList.add("me");
     ul.appendChild(li);
   });
+  renderRecord();
   show("reveal");
   burstConfetti(220);
   navigator.vibrate && navigator.vibrate(120);
