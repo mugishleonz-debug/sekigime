@@ -5,7 +5,7 @@
 
 - 本番URL: https://mugishleonz-debug.github.io/sekigime/ (GitHub Pages, `main` ブランチ直配信)
 - リポジトリ: https://github.com/mugishleonz-debug/sekigime
-- サーバー: Deno Deploy(プロジェクト名 `sekigime` 予定。※初回デプロイはオーナーの認証待ち)
+- サーバー: https://sekigime.mugishleonz-debug.deno.net (新Deno Deploy / app.deno.com, アプリ名 `sekigime`)
 
 ---
 
@@ -149,15 +149,23 @@ curl -X POST localhost:8787/attempt -H 'content-type: application/json' -d '{"na
 curl "localhost:8787/attempts?pin=8888"
 ```
 
-### デプロイ(Deno Deploy)
+### デプロイ(新Deno Deploy = app.deno.com)
+
+**旧CLI(deployctl)は使えない**(新世代アカウントでは認証ページがダッシュボードへリダイレクトされるだけ)。Deno 2.x 内蔵の新CLIを使う:
 
 ```sh
-deno run -A jsr:@deno/deployctl deploy --project=sekigime \
-  --entrypoint=server/main.ts --env=ADMIN_PIN=7345 --prod
+cd server
+deno deploy --prod            # 初回のみ対話式(ブラウザ認証、要TTY)。以降は --non-interactive 可
+deno deploy env add ADMIN_PIN <秘密の4桁>   # PINの設定/変更(適用時に再起動が走る)
 ```
 
-初回はブラウザ認証(GitHubログイン可)。**2026-07-06時点でオーナー認証待ち・未デプロイ**。
-デプロイ後にやること: `index.html` の `CONFIG.SERVER` に発行URL(例 `https://sekigime.deno.dev`)を入れて push。
+- 設定は `server/deno.jsonc`(CLIが自動生成、org/app名を保持)
+- **PINをリポジトリに書かないこと**(このリポジトリは公開。過去に書いて消した経緯あり)
+- **ストレージは実測で memory モード**(新Deno Deployは `Deno.openKv()` 非対応 → §4のフォールバックが作動)。含意:
+  - 再デプロイ・env変更・再起動のたびに解禁フラグと検挙リストが消える → **本番当日は絶対に再デプロイしない**
+  - 万一本番中に消えたら: 幹事が解禁ボタンをもう一度押す。検挙の証拠は各ゲスト端末のローカル記録(結果画面のスタンプ)が正本
+  - 複数インスタンスに分かれると解禁が一部に伝わらない理論リスクあり(この規模ではまず起きない)。最終安全網は解禁コードの口頭発表
+- 動作中の保存方式は `GET /attempts?pin=…` の `storage` フィールド(`kv`/`memory`)で確認できる
 
 ---
 

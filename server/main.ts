@@ -10,6 +10,7 @@
 type Attempt = { name: string; ts: number };
 
 interface Store {
+  kind: "kv" | "memory";
   getUnlocked(): Promise<boolean>;
   setUnlocked(v: boolean): Promise<void>;
   addAttempt(a: Attempt): Promise<void>;
@@ -21,6 +22,7 @@ async function makeStore(): Promise<Store> {
   try {
     const kv = await Deno.openKv();
     return {
+      kind: "kv",
       async getUnlocked() { return !!(await kv.get(["state", "unlocked"])).value; },
       async setUnlocked(v) { await kv.set(["state", "unlocked"], v); },
       async addAttempt(a) { await kv.set(["attempt", a.ts, crypto.randomUUID()], a); },
@@ -38,6 +40,7 @@ async function makeStore(): Promise<Store> {
     let unlocked = false;
     let attempts: Attempt[] = [];
     return {
+      kind: "memory",
       getUnlocked: () => Promise.resolve(unlocked),
       setUnlocked: (v) => { unlocked = v; return Promise.resolve(); },
       addAttempt: (a) => { attempts.push(a); return Promise.resolve(); },
@@ -97,6 +100,7 @@ export default {
       return json({
         unlocked: await store.getUnlocked(),
         attempts: await store.listAttempts(),
+        storage: store.kind,
       });
     }
 
