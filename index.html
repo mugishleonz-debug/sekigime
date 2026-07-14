@@ -337,6 +337,10 @@
 /* ================================================================
    ★★★ 幹事が編集するのはここだけ ★★★
    ---------------------------------------------------------------
+   考え方:「条件付きランダム」
+     ・枠(各卓の新郎側/新婦側の人数・幹事の固定席)は運営が決める
+     ・枠の中の「誰がどの卓か」だけを、くじで完全ランダムに決める
+   ---------------------------------------------------------------
    SERVER : 極小サーバーのURL(末尾スラッシュなし)。
             設定すると「幹事がボタンを押した瞬間に全員自動解錠」
             +「フライングが名前つきで幹事に通報」される。
@@ -344,40 +348,73 @@
    CODE   : 解禁コード(4桁)。サーバー障害時の予備手段として
             当日マイクで発表すれば手入力でも解錠できる。
             ※コードを変えると抽選結果も変わります。
-   GUESTS : ゲストの名簿。g は "M"(男性) / "F"(女性)。
-            「女性だけの卓」ができないように内部で使うだけで、
-            画面には表示されません。
-            人数は40名ちょうどでなくてOK。欠席が出たら行を
-            消すだけで、8卓にできるだけ均等に振り分けます。
-   ※注意: 解禁コードを発表した後に名簿やコードを変更しない
-            こと。全員の抽選結果が変わってしまいます。
+   TABLES : 卓の枠。groom=新郎側の人数, bride=新婦側の人数。
+            席数は groom+bride で自動計算。
+            ★brideを1にしないこと(新婦側1人ぼっち防止。0か2以上)
+   GUESTS : 名簿。g:"M"/"F"(性別)、s:"郎"/"婦"(新郎側/新婦側)。
+            どちらも画面には表示されず、抽選条件にだけ使う。
+   FIXED  : 席を固定する人(幹事など)。{n:名前, t:卓の番号(0始まり)}
+   PAIRS  : 必ず同じ卓にする2人組。["名前","名前"] を並べる。
+            (「知り合いゼロの席」防止。多すぎると抽選が破綻するので
+             本当に必要な組だけ。空 [] でもOK)
+   MIX    : 全卓の男女バランス下限。minF=各卓の女性最低人数,
+            minM=男性最低人数。卓ごとに変えたい場合はTABLESの
+            行に minF/minM を書けばその卓だけ上書きされる。
+   ※注意: 解禁コードを発表した後にこの設定を変更しないこと。
+            全員の抽選結果が変わってしまいます。
    ================================================================ */
 const CONFIG = {
   SERVER: "https://sekigime.mugishleonz-debug.deno.net",
   CODE: "0705",
-  TABLES: 8,
-  GUESTS: [
-    {n:"佐藤 健太",  g:"M"}, {n:"鈴木 美咲",  g:"F"},
-    {n:"高橋 大輔",  g:"M"}, {n:"田中 由紀",  g:"F"},
-    {n:"伊藤 翔太",  g:"M"}, {n:"渡辺 彩香",  g:"F"},
-    {n:"山本 拓也",  g:"M"}, {n:"中村 千夏",  g:"F"},
-    {n:"小林 亮",    g:"M"}, {n:"加藤 真央",  g:"F"},
-    {n:"吉田 悠人",  g:"M"}, {n:"山田 沙織",  g:"F"},
-    {n:"佐々木 蓮",  g:"M"}, {n:"山口 恵里",  g:"F"},
-    {n:"松本 一樹",  g:"M"}, {n:"井上 菜々",  g:"F"},
-    {n:"木村 俊介",  g:"M"}, {n:"林 美穂",    g:"F"},
-    {n:"斎藤 貴之",  g:"M"}, {n:"清水 楓",    g:"F"},
-    {n:"山崎 直人",  g:"M"}, {n:"森 亜美",    g:"F"},
-    {n:"池田 圭吾",  g:"M"}, {n:"橋本 里奈",  g:"F"},
-    {n:"阿部 慎二",  g:"M"}, {n:"石川 遥",    g:"F"},
-    {n:"中島 剛",    g:"M"}, {n:"前田 詩織",  g:"F"},
-    {n:"藤田 淳",    g:"M"}, {n:"後藤 明日香",g:"F"},
-    {n:"岡田 光",    g:"M"}, {n:"長谷川 舞",  g:"F"},
-    {n:"村上 竜也",  g:"M"}, {n:"近藤 早紀",  g:"F"},
-    {n:"石井 智也",  g:"M"}, {n:"坂本 香奈",  g:"F"},
-    {n:"遠藤 勇気",  g:"M"}, {n:"青木 未来",  g:"F"},
-    {n:"西村 徹",    g:"M"}, {n:"福田 のぞみ",g:"F"},
+
+  TABLES: [
+    {name:"1卓",  groom:3, bride:2},   // 5人卓(混合)
+    {name:"2卓",  groom:3, bride:2},   // 5人卓(混合)
+    {name:"3卓",  groom:3, bride:2},   // 5人卓(混合)
+    {name:"4卓",  groom:3, bride:2},   // 5人卓(混合)
+    {name:"5卓",  groom:5, bride:0},   // 5人卓(新郎側・幹事固定)
+    {name:"6卓",  groom:5, bride:0},   // 5人卓(新郎側・幹事固定)
+    {name:"大卓", groom:6, bride:4, minF:3, minM:3},  // 10人卓(混合・男女3人以上ずつ)
   ],
+
+  GUESTS: [
+    // --- 新郎側 男性 19人(うち幹事2人はFIXEDで席固定) ---
+    {n:"佐藤 健太",  g:"M", s:"郎"}, {n:"高橋 大輔",  g:"M", s:"郎"},
+    {n:"伊藤 翔太",  g:"M", s:"郎"}, {n:"山本 拓也",  g:"M", s:"郎"},
+    {n:"小林 亮",    g:"M", s:"郎"}, {n:"吉田 悠人",  g:"M", s:"郎"},
+    {n:"佐々木 蓮",  g:"M", s:"郎"}, {n:"松本 一樹",  g:"M", s:"郎"},
+    {n:"木村 俊介",  g:"M", s:"郎"}, {n:"斎藤 貴之",  g:"M", s:"郎"},
+    {n:"山崎 直人",  g:"M", s:"郎"}, {n:"池田 圭吾",  g:"M", s:"郎"},
+    {n:"阿部 慎二",  g:"M", s:"郎"}, {n:"中島 剛",    g:"M", s:"郎"},
+    {n:"藤田 淳",    g:"M", s:"郎"}, {n:"岡田 光",    g:"M", s:"郎"},
+    {n:"村上 竜也",  g:"M", s:"郎"}, {n:"石井 智也",  g:"M", s:"郎"},
+    {n:"遠藤 勇気",  g:"M", s:"郎"},
+    // --- 新郎側 女性 9人 ---
+    {n:"鈴木 美咲",  g:"F", s:"郎"}, {n:"田中 由紀",  g:"F", s:"郎"},
+    {n:"渡辺 彩香",  g:"F", s:"郎"}, {n:"中村 千夏",  g:"F", s:"郎"},
+    {n:"加藤 真央",  g:"F", s:"郎"}, {n:"山田 沙織",  g:"F", s:"郎"},
+    {n:"山口 恵里",  g:"F", s:"郎"}, {n:"井上 菜々",  g:"F", s:"郎"},
+    {n:"林 美穂",    g:"F", s:"郎"},
+    // --- 新婦側 男性 2人 ---
+    {n:"西村 徹",    g:"M", s:"婦"}, {n:"青木 拓海",  g:"M", s:"婦"},
+    // --- 新婦側 女性 10人 ---
+    {n:"清水 楓",    g:"F", s:"婦"}, {n:"森 亜美",    g:"F", s:"婦"},
+    {n:"橋本 里奈",  g:"F", s:"婦"}, {n:"石川 遥",    g:"F", s:"婦"},
+    {n:"前田 詩織",  g:"F", s:"婦"}, {n:"後藤 明日香",g:"F", s:"婦"},
+    {n:"長谷川 舞",  g:"F", s:"婦"}, {n:"近藤 早紀",  g:"F", s:"婦"},
+    {n:"福田 のぞみ",g:"F", s:"婦"}, {n:"坂本 香奈",  g:"F", s:"婦"},
+  ],
+
+  FIXED: [
+    {n:"佐藤 健太", t:4},   // 幹事A → 5卓
+    {n:"高橋 大輔", t:5},   // 幹事B → 6卓
+  ],
+
+  PAIRS: [
+    // 例: ["西村 徹", "青木 拓海"],  ← 新婦側の男性2人を同卓にする等
+  ],
+
+  MIX: { minF:1, minM:1 },
 };
 /* ================================================================ */
 
@@ -399,27 +436,60 @@ function mulberry32(a){
     return ((t ^ (t>>>14)) >>> 0) / 4294967296; };
 }
 
-/* ---- 抽選本体:女性だけの卓ができたら自動で引き直す(決定論的) ----
-   人数が 8 の倍数でなくても、各卓にできるだけ均等に振り分ける。
-   (例: 39名 → 5名の卓が7つ + 4名の卓が1つ) */
-function drawTables(code){
-  const N = CONFIG.GUESTS.length, T = CONFIG.TABLES;
-  const sizes = [];
-  for(let t=0;t<T;t++) sizes.push(Math.floor(N/T) + (t < N%T ? 1 : 0));
-  for(let salt=0; salt<5000; salt++){
-    const rand = mulberry32(xmur3(code + "#" + salt)());
-    const pool = CONFIG.GUESTS.slice();
-    for(let i=pool.length-1;i>0;i--){           // Fisher–Yates
-      const j = Math.floor(rand()*(i+1));
-      [pool[i],pool[j]] = [pool[j],pool[i]];
-    }
-    const tables = [];
-    let cur = 0;
-    for(const size of sizes){ tables.push(pool.slice(cur, cur+size)); cur += size; }
-    const ok = tables.every(tab => tab.some(p => p.g === "M"));
-    if(ok) return tables;
+/* ---- 抽選本体:「条件付きランダム」(決定論的) ----
+   1. 幹事などFIXEDの人を先に自席へ置く
+   2. 新郎側・新婦側それぞれのプールをシードでシャッフル
+   3. 各卓の枠(groom/bride)どおりに順番に流し込む
+   4. 条件チェック(全卓の男女下限・PAIRSの同卓)に落ちたら
+      saltを変えて引き直し。引き直しも決定論的なので全端末一致 */
+function shuffled(arr, rand){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){               // Fisher–Yates
+    const j = Math.floor(rand()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
   }
-  return null; // 男性が7人以下などで制約を満たせない場合
+  return a;
+}
+function drawTables(code){
+  const fixedNames = new Set(CONFIG.FIXED.map(f=>f.n));
+  const groomAll = CONFIG.GUESTS.filter(p=>p.s==="郎" && !fixedNames.has(p.n));
+  const brideAll = CONFIG.GUESTS.filter(p=>p.s==="婦" && !fixedNames.has(p.n));
+  const byName = new Map(CONFIG.GUESTS.map(p=>[p.n,p]));
+
+  for(let salt=0; salt<50000; salt++){
+    const rand = mulberry32(xmur3(code + "#" + salt)());
+    const groomPool = shuffled(groomAll, rand);
+    const bridePool = shuffled(brideAll, rand);
+
+    // 各卓の残り枠(FIXEDの人のぶんを差し引く)
+    const tables = CONFIG.TABLES.map(()=>[]);
+    const need = CONFIG.TABLES.map(t=>({groom:t.groom, bride:t.bride}));
+    for(const f of CONFIG.FIXED){
+      const p = byName.get(f.n);
+      tables[f.t].push(p);
+      need[f.t][p.s==="郎" ? "groom" : "bride"]--;
+    }
+    let gi = 0, bi = 0;
+    for(let t=0;t<tables.length;t++){
+      for(let k=0;k<need[t].groom;k++) tables[t].push(groomPool[gi++]);
+      for(let k=0;k<need[t].bride;k++) tables[t].push(bridePool[bi++]);
+    }
+
+    // 条件チェック(男女下限は卓ごとの上書きがあればそちらを使う)
+    const mixOk = tables.every((tab,ti) =>
+      tab.filter(p=>p.g==="F").length >= (CONFIG.TABLES[ti].minF ?? CONFIG.MIX.minF) &&
+      tab.filter(p=>p.g==="M").length >= (CONFIG.TABLES[ti].minM ?? CONFIG.MIX.minM)
+    );
+    if(!mixOk) continue;
+    const tableIdxOf = name => tables.findIndex(tab => tab.some(p=>p.n===name));
+    const pairsOk = CONFIG.PAIRS.every(([a,b]) =>
+      tableIdxOf(a) !== -1 && tableIdxOf(a) === tableIdxOf(b)
+    );
+    if(!pairsOk) continue;
+
+    return tables;
+  }
+  return null; // 枠や条件がきつすぎて5万回引いても成立しない場合
 }
 
 /* ---- 画面まわり ---- */
@@ -432,10 +502,32 @@ function show(id){
   window.scrollTo(0,0);
 }
 
-/* 設定ミスの検知 */
+/* 設定ミスの検知(枠と名簿の不整合はロード時に即エラー表示) */
 (function validate(){
-  if(CONFIG.GUESTS.length < CONFIG.TABLES){
-    $("app").innerHTML = `<div class="config-error">⚠️ 設定エラー<br>ゲストが ${CONFIG.GUESTS.length} 名しかいません。${CONFIG.TABLES}卓には最低 ${CONFIG.TABLES} 名が必要です。<br>CONFIG.GUESTS を確認してください。</div>`;
+  const errs = [];
+  const names = new Set(CONFIG.GUESTS.map(p=>p.n));
+  const groomN = CONFIG.GUESTS.filter(p=>p.s==="郎").length;
+  const brideN = CONFIG.GUESTS.filter(p=>p.s==="婦").length;
+  const quotaG = CONFIG.TABLES.reduce((a,t)=>a+t.groom,0);
+  const quotaB = CONFIG.TABLES.reduce((a,t)=>a+t.bride,0);
+  if(groomN !== quotaG) errs.push(`新郎側: 名簿${groomN}名 ≠ 卓の枠合計${quotaG}名`);
+  if(brideN !== quotaB) errs.push(`新婦側: 名簿${brideN}名 ≠ 卓の枠合計${quotaB}名`);
+  CONFIG.TABLES.forEach(t=>{
+    if(t.bride === 1) errs.push(`${t.name}: 新婦側が1人だけの枠はNG(0か2以上に)`);
+  });
+  CONFIG.FIXED.forEach(f=>{
+    if(!names.has(f.n)) errs.push(`FIXED「${f.n}」が名簿にいません`);
+    if(!(f.t >= 0 && f.t < CONFIG.TABLES.length)) errs.push(`FIXED「${f.n}」の卓番号 ${f.t} が不正です`);
+  });
+  CONFIG.PAIRS.forEach(pr=>{
+    pr.forEach(n=>{ if(!names.has(n)) errs.push(`PAIRS「${n}」が名簿にいません`); });
+  });
+  if(errs.length === 0 && drawTables(CONFIG.CODE) === null){
+    errs.push("枠・男女下限(MIX)・PAIRSの条件がきつすぎて、抽選が成立しません。条件を緩めてください");
+  }
+  if(errs.length){
+    $("app").innerHTML = `<div class="config-error">⚠️ 設定エラー<br>${errs.join("<br>")}</div>`;
+    throw new Error("config error");
   }
 })();
 
@@ -521,7 +613,7 @@ function doUnlock(){
   stopPolling();
   tables = drawTables(CONFIG.CODE);
   if(!tables){
-    $("skullmsg").textContent = "⚠️ 男性が少なすぎて『女性だけの卓を作らない』条件を満たせません";
+    $("skullmsg").textContent = "⚠️ 設定エラー: 抽選条件を満たせません(幹事に連絡を)";
     return;
   }
   sessionStorage.setItem("sekigime_code", CONFIG.CODE);
@@ -600,7 +692,8 @@ function startRoll(name){
   const slot = $("slotnum");
   let ticks = 0;
   const iv = setInterval(()=>{
-    slot.textContent = 1 + Math.floor(Math.random()*CONFIG.TABLES);
+    const r = CONFIG.TABLES[Math.floor(Math.random()*CONFIG.TABLES.length)];
+    slot.textContent = r.name.replace(/卓$/,"");
     ticks++;
     if(ticks > 22){
       clearInterval(iv);
@@ -610,9 +703,10 @@ function startRoll(name){
   navigator.vibrate && navigator.vibrate([30,50,30]);
 }
 function revealResult(name, t){
+  const tbl = CONFIG.TABLES[t];
   $("revname").textContent = name + " さん";
-  $("revnum").textContent = t+1;
-  $("revtaku").textContent = (t+1) + " 卓";
+  $("revnum").textContent = tbl.name.replace(/卓$/,"");
+  $("revtaku").textContent = tbl.name + `(${tbl.groom + tbl.bride}名)`;
   const ul = $("mates"); ul.innerHTML = "";
   tables[t].forEach(p=>{
     const li = document.createElement("li");
@@ -632,7 +726,7 @@ function buildAllTables(){
   tables.forEach((tab,i)=>{
     const card = document.createElement("div");
     card.className = "tablecard";
-    card.innerHTML = `<h3>🍾 ${i+1} 卓</h3>`;
+    card.innerHTML = `<h3>🍾 ${CONFIG.TABLES[i].name}(${tab.length}名)</h3>`;
     const ul = document.createElement("ul");
     tab.forEach(p=>{
       const li = document.createElement("li");
