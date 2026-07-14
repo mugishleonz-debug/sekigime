@@ -2,161 +2,201 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<title>席決めの儀 ☠️ iPad受付</title>
+<title>席決めの儀 🥂 iPad受付</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <style>
   :root{
-    --ink:#0b0a08; --ink2:#151310;
-    --bone:#f2ead8; --bone-dim:#b8ad93;
-    --hazard:#f5c518; --blood:#e0483e; --gold:#e8b64c;
+    --cream:#fff9f0;
+    --card:#ffffff;
+    --ink:#4a3b30;
+    --dim:#a4907e;
+    --gold:#e5a83d;
+    --gold-deep:#c98a1e;
+    --coral:#ff7a8a;
+    --coral-deep:#e85d70;
+    --mint:#6fcfa8;
+    --sky:#7cc3ea;
+    --line:#f2e4d0;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
   html,body{margin:0;padding:0}
   body{
-    background:var(--ink); color:var(--bone);
-    font-family:"Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic",sans-serif;
+    background:var(--cream); color:var(--ink);
+    font-family:"Hiragino Maru Gothic ProN","Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic",sans-serif;
     min-height:100dvh; overflow-x:hidden;
   }
+  /* ふわっと漂う紙吹雪の背景 */
   body::before{
-    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.55;
     background:
-      radial-gradient(60% 45% at 50% 0%, rgba(245,197,24,.07), transparent 70%),
-      radial-gradient(80% 60% at 50% 110%, rgba(224,72,62,.08), transparent 70%);
+      radial-gradient(6px 6px at 12% 22%, var(--coral) 50%, transparent 51%),
+      radial-gradient(5px 5px at 28% 68%, var(--sky) 50%, transparent 51%),
+      radial-gradient(7px 7px at 46% 34%, var(--gold) 50%, transparent 51%),
+      radial-gradient(5px 5px at 64% 76%, var(--mint) 50%, transparent 51%),
+      radial-gradient(6px 6px at 79% 18%, var(--coral) 50%, transparent 51%),
+      radial-gradient(5px 5px at 90% 55%, var(--sky) 50%, transparent 51%),
+      radial-gradient(4px 4px at 8% 85%, var(--gold) 50%, transparent 51%),
+      radial-gradient(5px 5px at 55% 8%, var(--mint) 50%, transparent 51%);
   }
   #app{position:relative;z-index:1;max-width:820px;margin:0 auto;padding:0 28px 60px;min-height:100dvh}
   .screen{display:none;animation:fadein .4s ease both}
   .screen.on{display:block}
   @keyframes fadein{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
+  /* ==== お祝いリボン(上下の帯) ==== */
   .tape{
-    position:fixed;left:0;right:0;height:28px;z-index:2;
-    background:repeating-linear-gradient(-45deg,var(--hazard) 0 20px,var(--ink) 20px 40px);
+    position:fixed;left:0;right:0;height:14px;z-index:2;
+    background:repeating-linear-gradient(-45deg,
+      var(--coral) 0 26px, var(--gold) 26px 52px,
+      var(--mint) 52px 78px, var(--sky) 78px 104px);
   }
-  .tape.top{top:0;transform:rotate(-.6deg) scaleX(1.05)}
-  .tape.bottom{bottom:0;transform:rotate(.6deg) scaleX(1.05)}
+  .tape.top{top:0}
+  .tape.bottom{bottom:0}
 
   /* ==== 待機画面 ==== */
   #standby{padding-top:80px;text-align:center}
   .skull{
-    font-size:130px;line-height:1;margin:20px 0 6px;display:inline-block;
-    filter:drop-shadow(0 0 26px rgba(245,197,24,.35));
-    animation:breathe 3.2s ease-in-out infinite;
+    font-size:120px;line-height:1;margin:20px 0 6px;display:inline-block;
+    filter:drop-shadow(0 12px 26px rgba(229,168,61,.35));
+    animation:sway 3s ease-in-out infinite;
   }
-  @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
-  h1{font-size:34px;font-weight:900;letter-spacing:.16em;margin:8px 0 4px}
-  .standby-sub{color:var(--bone-dim);font-size:16px;line-height:1.9;margin-bottom:8px}
+  @keyframes sway{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(6deg) scale(1.04)}}
+  h1{font-size:34px;font-weight:900;letter-spacing:.16em;margin:8px 0 4px;color:var(--ink)}
+  h1 .accent{color:var(--coral-deep)}
+  .standby-sub{color:var(--dim);font-size:16px;line-height:1.9;margin-bottom:8px}
   .counter{
     display:inline-block;margin:10px 0 26px;padding:8px 26px;border-radius:999px;
-    border:1.5px solid #3a352b;color:var(--gold);
+    background:var(--card);border:2px solid var(--line);color:var(--gold-deep);
     font-size:18px;font-weight:900;letter-spacing:.15em;
     font-variant-numeric:tabular-nums;
+    box-shadow:0 4px 14px rgba(74,59,48,.06);
   }
   .btn{
-    appearance:none;border:none;cursor:pointer;border-radius:16px;
+    appearance:none;border:none;cursor:pointer;border-radius:18px;
     font-family:inherit;font-weight:900;letter-spacing:.1em;
     transition:transform .08s ease;
   }
   .btn:active{transform:scale(.96)}
   .btn-draw{
-    display:block;margin:0 auto;padding:28px 60px;font-size:30px;color:var(--ink);
-    background:linear-gradient(180deg,#f8dd8e,var(--gold));
-    box-shadow:0 10px 0 #7d5a14, 0 20px 50px rgba(232,182,76,.25);
+    display:block;margin:0 auto;padding:28px 60px;font-size:30px;color:#fff;
+    background:linear-gradient(180deg,#ff9aa7,var(--coral) 55%,var(--coral-deep));
+    box-shadow:0 10px 0 #c94b5d, 0 22px 46px rgba(232,93,112,.35);
     animation:pulse 2s ease-in-out infinite;
   }
-  @keyframes pulse{0%,100%{box-shadow:0 10px 0 #7d5a14, 0 20px 50px rgba(232,182,76,.2)}50%{box-shadow:0 10px 0 #7d5a14, 0 20px 70px rgba(232,182,76,.5)}}
-  .btn-ghost{padding:12px 22px;font-size:15px;color:var(--bone-dim);background:transparent;border:1.5px solid #3a352b}
-  .btn-gold{padding:16px 30px;font-size:18px;color:var(--ink);background:linear-gradient(180deg,#f6d98a,var(--gold));box-shadow:0 6px 0 #7d5a14}
-  .btn-blood{padding:12px 22px;font-size:15px;color:#fff;background:linear-gradient(180deg,#e0483e,#a32620);box-shadow:0 5px 0 #5e120e}
-  .standby-tools{margin-top:34px;display:flex;gap:14px;justify-content:center}
-  .done-banner{
-    font-size:26px;font-weight:900;color:var(--gold);letter-spacing:.2em;margin:20px 0;
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+  .btn-ghost{
+    padding:12px 22px;font-size:15px;color:var(--dim);
+    background:var(--card);border:2px solid var(--line);
   }
+  .btn-gold{
+    padding:16px 30px;font-size:18px;color:#fff;
+    background:linear-gradient(180deg,#f2c064,var(--gold) 60%,var(--gold-deep));
+    box-shadow:0 6px 0 #a06e12;
+  }
+  .btn-blood{
+    padding:12px 22px;font-size:15px;color:#fff;
+    background:linear-gradient(180deg,#ff9aa7,var(--coral-deep));
+    box-shadow:0 5px 0 #b13c4e;
+  }
+  .btn-hazard{
+    padding:14px 24px;font-size:16px;color:#fff;
+    background:linear-gradient(180deg,#f2c064,var(--gold-deep));
+    box-shadow:0 6px 0 #a06e12;
+  }
+  .standby-tools{margin-top:34px;display:flex;gap:14px;justify-content:center}
+  .done-banner{font-size:28px;font-weight:900;color:var(--coral-deep);letter-spacing:.15em;margin:20px 0}
 
   /* ==== 名前選択 ==== */
   #choose{padding-top:60px}
-  .kaikin{text-align:center;font-size:30px;font-weight:900;letter-spacing:.2em;color:var(--gold);margin:10px 0 4px;text-shadow:0 0 30px rgba(232,182,76,.4)}
-  .choose-sub{text-align:center;color:var(--bone-dim);font-size:15px;margin-bottom:18px}
+  .kaikin{
+    text-align:center;font-size:30px;font-weight:900;letter-spacing:.14em;
+    color:var(--gold-deep);margin:10px 0 4px;
+  }
+  .choose-sub{text-align:center;color:var(--dim);font-size:15px;margin-bottom:18px}
   #namefilter{
-    width:100%;padding:16px 18px;font-size:20px;color:var(--bone);
-    background:var(--ink2);border:2px solid #3a352b;border-radius:14px;outline:none;margin-bottom:16px;
+    width:100%;padding:16px 18px;font-size:20px;color:var(--ink);
+    background:var(--card);border:2px solid var(--line);border-radius:16px;outline:none;margin-bottom:16px;
     font-family:inherit;
   }
   #namefilter:focus{border-color:var(--gold)}
   .namegrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
   @media (max-width:560px){.namegrid{grid-template-columns:1fr 1fr}}
   .namebtn{
-    padding:20px 8px;font-size:18px;font-weight:700;color:var(--bone);
-    background:var(--ink2);border:1.5px solid #35301f;border-radius:14px;cursor:pointer;
-    font-family:inherit;
+    padding:20px 8px;font-size:18px;font-weight:800;color:var(--ink);
+    background:var(--card);border:2px solid var(--line);border-radius:16px;cursor:pointer;
+    font-family:inherit;box-shadow:0 3px 10px rgba(74,59,48,.05);
   }
-  .namebtn:active{transform:scale(.95);border-color:var(--gold)}
+  .namebtn:active{transform:scale(.95);border-color:var(--coral)}
   .toolrow{display:flex;justify-content:center;gap:14px;margin:26px 0 0}
 
   /* ==== スロット ==== */
   #roll{padding-top:150px;text-align:center}
-  .roll-name{font-size:24px;font-weight:800;color:var(--bone-dim);letter-spacing:.1em}
+  .roll-name{font-size:24px;font-weight:800;color:var(--dim);letter-spacing:.1em}
   .slot{
-    font-size:160px;font-weight:900;line-height:1.1;margin:24px 0;color:var(--gold);
-    text-shadow:0 0 50px rgba(232,182,76,.45);
+    font-size:160px;font-weight:900;line-height:1.1;margin:24px 0;color:var(--coral-deep);
+    text-shadow:0 10px 34px rgba(232,93,112,.3);
   }
-  .roll-label{font-size:18px;letter-spacing:.5em;color:var(--bone-dim)}
+  .roll-label{font-size:18px;letter-spacing:.5em;color:var(--dim)}
 
   /* ==== 結果 ==== */
   #result{padding-top:70px;text-align:center}
   .res-name{font-size:26px;font-weight:800;margin-bottom:4px}
-  .res-order{font-size:14px;letter-spacing:.3em;color:var(--bone-dim);margin-bottom:6px}
+  .res-order{font-size:14px;letter-spacing:.3em;color:var(--dim);margin-bottom:6px}
   .res-table{
     font-size:170px;font-weight:900;line-height:1;margin:8px 0 2px;
-    background:linear-gradient(180deg,#ffe9ad,var(--gold) 60%,#a97b1e);
+    background:linear-gradient(180deg,#f6c964,var(--gold) 55%,var(--gold-deep));
     -webkit-background-clip:text;background-clip:text;color:transparent;
-    filter:drop-shadow(0 4px 24px rgba(232,182,76,.35));
+    filter:drop-shadow(0 10px 24px rgba(229,168,61,.35));
     animation:pop .5s cubic-bezier(.2,2,.4,1) both;
   }
   @keyframes pop{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
-  .res-taku{font-size:32px;font-weight:900;letter-spacing:.3em;color:var(--gold);margin-bottom:24px}
+  .res-taku{font-size:32px;font-weight:900;letter-spacing:.3em;color:var(--gold-deep);margin-bottom:24px}
   .mates{
-    background:var(--ink2);border:1.5px solid #35301f;border-radius:18px;
+    background:var(--card);border:2px solid var(--line);border-radius:22px;
     padding:18px 22px;margin:0 auto 26px;max-width:560px;
+    box-shadow:0 8px 26px rgba(74,59,48,.07);
   }
-  .mates h3{margin:0 0 12px;font-size:13px;letter-spacing:.3em;color:var(--bone-dim);text-align:center}
+  .mates h3{margin:0 0 12px;font-size:13px;letter-spacing:.3em;color:var(--dim);text-align:center}
   .mates ul{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
-  .mates li{font-size:17px;font-weight:700;padding:8px 16px;background:#1e1a13;border-radius:10px}
-  .mates li.me{color:var(--ink);background:var(--gold)}
-  .mates li.mystery{color:#6e6650;border:1.5px dashed #3a352b;background:transparent}
-  .auto-note{font-size:13px;color:var(--bone-dim)}
+  .mates li{font-size:17px;font-weight:800;padding:8px 16px;background:#fdf3e3;border-radius:12px}
+  .mates li.me{color:#fff;background:linear-gradient(180deg,#ff9aa7,var(--coral-deep))}
+  .mates li.mystery{color:#c9b7a5;border:2px dashed var(--line);background:transparent}
+  .auto-note{font-size:13px;color:var(--dim)}
 
   /* ==== 全卓一覧 ==== */
   #all{padding-top:60px}
-  .all-title{text-align:center;font-size:26px;font-weight:900;letter-spacing:.2em;color:var(--gold);margin-bottom:20px}
+  .all-title{text-align:center;font-size:26px;font-weight:900;letter-spacing:.2em;color:var(--gold-deep);margin-bottom:20px}
   .tablegrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
   @media (max-width:640px){.tablegrid{grid-template-columns:1fr}}
-  .tablecard{background:var(--ink2);border:1.5px solid #35301f;border-radius:16px;padding:16px 18px}
+  .tablecard{
+    background:var(--card);border:2px solid var(--line);border-radius:18px;padding:16px 18px;
+    box-shadow:0 6px 18px rgba(74,59,48,.06);
+  }
   .tablecard.wide{grid-column:1 / -1}
-  .tablecard h3{margin:0 0 10px;font-size:17px;font-weight:900;color:var(--gold);letter-spacing:.12em}
+  .tablecard h3{margin:0 0 10px;font-size:17px;font-weight:900;color:var(--gold-deep);letter-spacing:.12em}
   .tablecard ul{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:8px}
-  .tablecard li{font-size:15px;font-weight:700;padding:6px 14px;background:#1e1a13;border-radius:999px}
-  .tablecard li.mystery{color:#6e6650;border:1.5px dashed #3a352b;background:transparent}
+  .tablecard li{font-size:15px;font-weight:800;padding:6px 14px;background:#fdf3e3;border-radius:999px}
+  .tablecard li.mystery{color:#c9b7a5;border:2px dashed var(--line);background:transparent}
 
   /* ==== 幹事 ==== */
   #admin{padding-top:60px;max-width:620px;margin:0 auto}
   .codebox{display:flex;gap:12px;justify-content:center;margin:14px 0 30px}
   input[type=tel]{
     width:200px;padding:14px 16px;font-size:26px;letter-spacing:.4em;text-align:center;
-    font-weight:900;color:var(--bone);background:var(--ink2);
-    border:2px solid #3a352b;border-radius:12px;outline:none;font-family:inherit;
+    font-weight:900;color:var(--ink);background:var(--card);
+    border:2px solid var(--line);border-radius:14px;outline:none;font-family:inherit;
   }
-  input[type=tel]:focus{border-color:var(--hazard)}
-  .btn-hazard{padding:14px 24px;font-size:16px;color:var(--ink);background:var(--hazard);box-shadow:0 6px 0 #8a6d05}
-  .adminmsg{min-height:30px;text-align:center;color:var(--blood);font-weight:700;font-size:14px}
+  input[type=tel]:focus{border-color:var(--gold)}
+  .adminmsg{min-height:30px;text-align:center;color:var(--coral-deep);font-weight:700;font-size:14px}
   .drawnrow{
     display:flex;justify-content:space-between;align-items:center;
-    padding:10px 16px;background:var(--ink2);border:1.5px solid #35301f;
-    border-radius:12px;margin-bottom:8px;font-size:16px;font-weight:700;
+    padding:10px 16px;background:var(--card);border:2px solid var(--line);
+    border-radius:14px;margin-bottom:8px;font-size:16px;font-weight:700;
   }
-  .drawnrow .t{color:var(--gold);margin-left:auto;margin-right:14px;font-size:14px}
-  .undo{padding:8px 14px;font-size:13px;color:#fff;background:#7a2620;border:none;border-radius:8px;font-family:inherit;font-weight:800;cursor:pointer}
-  .admin-h{font-size:14px;font-weight:900;letter-spacing:.3em;color:var(--bone-dim);text-align:center;margin:34px 0 14px}
-  .config-error{padding:120px 10px;text-align:center;color:var(--blood);font-weight:800;line-height:2;font-size:18px}
+  .drawnrow .t{color:var(--gold-deep);margin-left:auto;margin-right:14px;font-size:14px}
+  .undo{padding:8px 14px;font-size:13px;color:#fff;background:var(--coral-deep);border:none;border-radius:10px;font-family:inherit;font-weight:800;cursor:pointer}
+  .admin-h{font-size:14px;font-weight:900;letter-spacing:.3em;color:var(--dim);text-align:center;margin:34px 0 14px}
+  .config-error{padding:120px 10px;text-align:center;color:var(--coral-deep);font-weight:800;line-height:2;font-size:18px}
   .warn-reset{padding:100px 20px;text-align:center;line-height:2.2}
 
   canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:5}
@@ -172,12 +212,12 @@
 
   <!-- ①待機(この画面をずっと表示しておく) -->
   <section class="screen on" id="standby">
-    <div class="skull">☠️</div>
+    <div class="skull">🥂</div>
     <h1>席決めの儀</h1>
-    <p class="standby-sub">ボタンを押して、運命の席を確定させよ。<br>早い者勝ちではない。だが逃げることもできない。</p>
+    <p class="standby-sub">ようこそ二次会へ!🎉<br>ボタンを押して、今日の席を引き当てよう。</p>
     <div class="counter"><span id="count">0</span> / <span id="total">40</span> 名 確定</div>
     <div id="drawarea">
-      <button class="btn btn-draw" id="drawbtn">☠️ くじを引く ☠️</button>
+      <button class="btn btn-draw" id="drawbtn">🥂 くじを引く 🥂</button>
     </div>
     <div class="standby-tools">
       <button class="btn btn-ghost" id="allbtn">全卓一覧</button>
@@ -187,12 +227,12 @@
 
   <!-- ②名前選択 -->
   <section class="screen" id="choose">
-    <div class="kaikin">☠️ 名を名乗れ ☠️</div>
-    <p class="choose-sub">自分の名前を押すと、その瞬間に席が確定する。もう戻れない。</p>
+    <div class="kaikin">🎀 お名前をどうぞ 🎀</div>
+    <p class="choose-sub">自分の名前をタップすると、その場で席が決まります。<br>(やり直しはできません。運命です🍀)</p>
     <input id="namefilter" type="text" placeholder="名前で検索…" autocomplete="off">
     <div class="namegrid" id="namegrid"></div>
     <div class="toolrow">
-      <button class="btn btn-ghost" id="choosebackbtn">やっぱりやめる</button>
+      <button class="btn btn-ghost" id="choosebackbtn">あとにする</button>
     </div>
   </section>
 
@@ -200,7 +240,7 @@
   <section class="screen" id="roll">
     <p class="roll-name" id="rollname"></p>
     <div class="slot" id="slotnum">?</div>
-    <p class="roll-label">運命抽選中</p>
+    <p class="roll-label">運命の卓を抽選中🎲</p>
   </section>
 
   <!-- ④結果 -->
@@ -210,11 +250,11 @@
     <div class="res-table" id="resnum">1</div>
     <p class="res-taku" id="restaku"></p>
     <div class="mates">
-      <h3>いま確定している同卓の仲間</h3>
+      <h3>🍻 いっしょの卓のなかま 🍻</h3>
       <ul id="mates"></ul>
     </div>
     <div class="toolrow">
-      <button class="btn btn-gold" id="nextbtn">OK! 次の人へ →</button>
+      <button class="btn btn-gold" id="nextbtn">🎉 OK! 次の人へどうぞ →</button>
     </div>
     <p class="auto-note" style="margin-top:14px">(<span id="autosec">15</span>秒後に自動で戻ります)</p>
   </section>
@@ -593,7 +633,7 @@ function showResult(name, t){
   if(mystery > 0){
     const li = document.createElement("li");
     li.className = "mystery";
-    li.textContent = `??? × ${mystery}(まだ運命待ち)`;
+    li.textContent = `??? × ${mystery}(おたのしみ✨)`;
     ul.appendChild(li);
   }
   show("result");
@@ -618,7 +658,7 @@ function buildAllTables(){
   tables.forEach((tab,i)=>{
     const card = document.createElement("div");
     card.className = "tablecard" + (tab.length > 6 ? " wide" : "");
-    card.innerHTML = `<h3>🍾 ${CONFIG.TABLES[i].name}(${tab.length}名)</h3>`;
+    card.innerHTML = `<h3>🥂 ${CONFIG.TABLES[i].name}(${tab.length}名)</h3>`;
     const ul = document.createElement("ul");
     tab.forEach(p=>{
       const li = document.createElement("li");

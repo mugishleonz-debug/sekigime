@@ -2,69 +2,79 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<title>席決めの儀 ☠️ 座席ボード</title>
+<title>席決めの儀 🥂 座席ボード</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <style>
   :root{
-    --ink:#0b0a08; --ink2:#151310;
-    --bone:#f2ead8; --bone-dim:#b8ad93;
-    --hazard:#f5c518; --blood:#e0483e; --gold:#e8b64c;
+    --cream:#fff9f0; --card:#ffffff;
+    --ink:#4a3b30; --dim:#a4907e;
+    --gold:#e5a83d; --gold-deep:#c98a1e;
+    --coral:#ff7a8a; --coral-deep:#e85d70;
+    --mint:#6fcfa8; --sky:#7cc3ea;
+    --line:#f2e4d0;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{margin:0;padding:0}
   body{
-    background:var(--ink); color:var(--bone);
-    font-family:"Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic",sans-serif;
+    background:var(--cream); color:var(--ink);
+    font-family:"Hiragino Maru Gothic ProN","Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic",sans-serif;
     min-height:100dvh; overflow-x:hidden;
   }
   body::before{
-    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.5;
     background:
-      radial-gradient(60% 45% at 50% 0%, rgba(245,197,24,.07), transparent 70%),
-      radial-gradient(80% 60% at 50% 110%, rgba(224,72,62,.08), transparent 70%);
+      radial-gradient(5px 5px at 12% 22%, var(--coral) 50%, transparent 51%),
+      radial-gradient(4px 4px at 28% 68%, var(--sky) 50%, transparent 51%),
+      radial-gradient(6px 6px at 46% 34%, var(--gold) 50%, transparent 51%),
+      radial-gradient(4px 4px at 64% 76%, var(--mint) 50%, transparent 51%),
+      radial-gradient(5px 5px at 79% 18%, var(--coral) 50%, transparent 51%),
+      radial-gradient(4px 4px at 90% 55%, var(--sky) 50%, transparent 51%);
   }
   #app{position:relative;z-index:1;max-width:520px;margin:0 auto;padding:0 20px 60px;min-height:100dvh}
 
   .tape{
-    position:fixed;left:0;right:0;height:24px;z-index:2;
-    background:repeating-linear-gradient(-45deg,var(--hazard) 0 18px,var(--ink) 18px 36px);
+    position:fixed;left:0;right:0;height:12px;z-index:2;
+    background:repeating-linear-gradient(-45deg,
+      var(--coral) 0 22px, var(--gold) 22px 44px,
+      var(--mint) 44px 66px, var(--sky) 66px 88px);
   }
-  .tape.top{top:0;transform:rotate(-1deg) scaleX(1.05)}
-  .tape.bottom{bottom:0;transform:rotate(1deg) scaleX(1.05)}
+  .tape.top{top:0}
+  .tape.bottom{bottom:0}
 
-  header{text-align:center;padding-top:52px}
-  .skull{font-size:56px;line-height:1;filter:drop-shadow(0 0 18px rgba(245,197,24,.3))}
-  h1{font-size:22px;font-weight:900;letter-spacing:.16em;margin:8px 0 2px}
-  .sub{color:var(--bone-dim);font-size:13px;line-height:1.9;margin:0 0 14px}
+  header{text-align:center;padding-top:46px}
+  .skull{font-size:52px;line-height:1;display:inline-block;animation:sway 3s ease-in-out infinite}
+  @keyframes sway{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(6deg)}}
+  h1{font-size:22px;font-weight:900;letter-spacing:.14em;margin:8px 0 2px}
+  .sub{color:var(--dim);font-size:13px;line-height:1.9;margin:0 0 14px}
   .counter{
     display:inline-block;margin:0 0 18px;padding:6px 22px;border-radius:999px;
-    border:1.5px solid #3a352b;color:var(--gold);
+    background:var(--card);border:2px solid var(--line);color:var(--gold-deep);
     font-size:15px;font-weight:900;letter-spacing:.12em;
     font-variant-numeric:tabular-nums;
+    box-shadow:0 4px 14px rgba(74,59,48,.06);
   }
   #search{
-    width:100%;padding:12px 16px;font-size:16px;color:var(--bone);
-    background:var(--ink2);border:2px solid #3a352b;border-radius:12px;outline:none;
+    width:100%;padding:12px 16px;font-size:16px;color:var(--ink);
+    background:var(--card);border:2px solid var(--line);border-radius:14px;outline:none;
     margin-bottom:16px;font-family:inherit;
   }
   #search:focus{border-color:var(--gold)}
 
   .tablecard{
-    background:var(--ink2);border:1.5px solid #35301f;border-radius:16px;
+    background:var(--card);border:2px solid var(--line);border-radius:18px;
     padding:14px 16px;margin-bottom:12px;
+    box-shadow:0 5px 16px rgba(74,59,48,.06);
   }
-  .tablecard h3{margin:0 0 8px;font-size:15px;font-weight:900;color:var(--gold);letter-spacing:.15em}
+  .tablecard h3{margin:0 0 8px;font-size:15px;font-weight:900;color:var(--gold-deep);letter-spacing:.12em}
   .tablecard ul{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:6px}
-  .tablecard li{font-size:14px;font-weight:700;padding:5px 12px;background:#1e1a13;border-radius:999px}
-  .tablecard li.mystery{color:#6e6650;border:1.5px dashed #3a352b;background:transparent}
-  .tablecard li.hit{color:var(--ink);background:var(--gold)}
+  .tablecard li{font-size:14px;font-weight:800;padding:5px 12px;background:#fdf3e3;border-radius:999px}
+  .tablecard li.mystery{color:#c9b7a5;border:2px dashed var(--line);background:transparent}
+  .tablecard li.hit{color:#fff;background:linear-gradient(180deg,#ff9aa7,var(--coral-deep))}
 
-  .empty{
-    text-align:center;padding:60px 10px;color:var(--bone-dim);line-height:2.2;font-size:15px;
-  }
+  .empty{text-align:center;padding:60px 10px;color:var(--dim);line-height:2.2;font-size:15px}
   .empty .big{font-size:44px}
-  .note{text-align:center;color:#6e6650;font-size:11.5px;margin-top:20px;line-height:1.9}
-  .err{color:var(--blood);text-align:center;font-weight:700;font-size:13px;min-height:20px}
+  .note{text-align:center;color:#c9b7a5;font-size:11.5px;margin-top:20px;line-height:1.9}
+  .err{color:var(--coral-deep);text-align:center;font-weight:700;font-size:13px;min-height:20px}
 </style>
 </head>
 <body>
@@ -74,15 +84,15 @@
 
 <div id="app">
   <header>
-    <div class="skull">☠️</div>
+    <div class="skull">🥂</div>
     <h1>席決めの儀 — 座席ボード</h1>
-    <p class="sub">会場のiPadでくじを引くと、ここに席が現れる。<br>「???」はまだ運命が確定していない席。</p>
+    <p class="sub">会場のiPadでくじを引くと、ここに席が出てきます。<br>「???」はまだお楽しみの席。</p>
     <div class="counter"><span id="count">-</span> / <span id="total">-</span> 名 確定</div>
   </header>
   <input id="search" type="text" placeholder="自分の名前で検索…" autocomplete="off">
   <p class="err" id="err"></p>
   <div id="boardarea"></div>
-  <p class="note">このページは10秒ごとに自動で最新になります。<br>先に自分の卓が確定した人は、焼肉の網を温めて待つように。</p>
+  <p class="note">このページは10秒ごとに自動で最新になります。<br>先に席が決まった人は、乾杯の練習をして待とう🍻</p>
 </div>
 
 <script>
@@ -101,7 +111,7 @@ let filter = "";
 function render(){
   const area = $("boardarea");
   if(!data){
-    area.innerHTML = `<div class="empty"><div class="big">☠️</div>受付はまだ始まっていない。<br>会場のiPadの前に立ち、覚悟を決めて名前を押せ。</div>`;
+    area.innerHTML = `<div class="empty"><div class="big">🥂</div>受付はまだ始まっていません。<br>会場のiPadで、くじを引いてね!</div>`;
     $("count").textContent = "-"; $("total").textContent = "-";
     return;
   }
@@ -113,7 +123,7 @@ function render(){
     const members = data.board.filter(b=>b.t===i);
     const card = document.createElement("div");
     card.className = "tablecard";
-    card.innerHTML = `<h3>🍾 ${t.name}(${t.size}名)</h3>`;
+    card.innerHTML = `<h3>🥂 ${t.name}(${t.size}名)</h3>`;
     const ul = document.createElement("ul");
     members.forEach(m=>{
       const li = document.createElement("li");

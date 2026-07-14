@@ -2,15 +2,15 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<title>使い方ガイド | 席決めの儀 ☠️</title>
+<title>使い方ガイド | 席決めの儀 🥂</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
   :root{
     --paper:#fffdf7;
     --ink:#2a2620;
     --dim:#6f6858;
-    --hazard:#f5c518;
-    --hazard-dark:#8a6d05;
+    --hazard:#e5a83d;
+    --hazard-dark:#a06e12;
     --gold:#b8860b;
     --blood:#c0392b;
     --line:#e8e2d2;
@@ -24,13 +24,15 @@
   }
   .wrap{max-width:760px;margin:0 auto;padding:0 22px 80px}
   header{
-    background:#141210;color:#f2ead8;text-align:center;
+    background:linear-gradient(180deg,#fff3e2,#ffe9d6);color:var(--ink);text-align:center;
     padding:44px 20px 38px;margin-bottom:40px;
-    border-bottom:8px solid var(--hazard);
+    border-bottom:8px solid transparent;
+    border-image:repeating-linear-gradient(-45deg,#ff7a8a 0 22px,#e5a83d 22px 44px,#6fcfa8 44px 66px,#7cc3ea 66px 88px) 8;
   }
-  header .skull{font-size:56px;line-height:1}
+  header .skull{font-size:56px;line-height:1;display:inline-block;animation:sway 3s ease-in-out infinite}
+  @keyframes sway{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(6deg)}}
   header h1{font-size:26px;font-weight:900;letter-spacing:.15em;margin:10px 0 4px}
-  header p{color:#b8ad93;font-size:14px;margin:0}
+  header p{color:#a4907e;font-size:14px;margin:0}
   h2{
     font-size:20px;font-weight:900;letter-spacing:.08em;
     border-left:8px solid var(--hazard);padding:2px 0 2px 14px;
@@ -46,7 +48,7 @@
   .step:last-of-type{border-bottom:none}
   .stepnum{
     flex:0 0 44px;height:44px;border-radius:50%;
-    background:var(--hazard);color:#141210;
+    background:var(--hazard);color:#fff;
     display:flex;align-items:center;justify-content:center;
     font-size:20px;font-weight:900;margin-top:4px;
   }
@@ -79,7 +81,7 @@
   .qa dd{margin:4px 0 0 0;font-size:14.5px}
   .qa dd::before{content:"A. ";color:var(--blood);font-weight:900}
   .pill{
-    display:inline-block;background:#141210;color:var(--hazard);
+    display:inline-block;background:var(--hazard);color:#fff;
     font-size:12px;font-weight:900;letter-spacing:.1em;
     padding:3px 12px;border-radius:999px;margin-right:6px;
   }
@@ -96,8 +98,8 @@
 <body>
 
 <header>
-  <div class="skull">☠️</div>
-  <h1>「席決めの儀」使い方ガイド</h1>
+  <div class="skull">🥂</div>
+  <h1>「席決めの儀 🎉」使い方ガイド</h1>
   <p>結婚式二次会・席決め抽選 — 会場のiPadでくじを引く方式</p>
 </header>
 
@@ -117,8 +119,8 @@
   <div class="step">
     <div class="stepnum">1</div>
     <div class="steptext">
-      <h3>受付のiPadで「☠️ くじを引く ☠️」を押す</h3>
-      <p>会場に着いたら受付のiPadへ。金のボタンを押すと名前の一覧が出ます。</p>
+      <h3>受付のiPadで「🥂 くじを引く 🥂」を押す</h3>
+      <p>会場に着いたら受付のiPadへ。ピンクの大きなボタンを押すと名前の一覧が出ます。</p>
       <img class="shot pad" src="img/ipad_1_standby.png" alt="iPadの待機画面">
     </div>
   </div>
@@ -213,7 +215,7 @@
   </div>
 
   <footer>
-    席決めの儀 ☠️ — Powered by 運命 &amp; JavaScript<br>
+    席決めの儀 🥂 — Powered by 運命 &amp; JavaScript<br>
     座席ボード: <a href="./index.html">index.html</a> ／ iPad受付: <a href="./ipad.html">ipad.html</a> ／ 枠の図: <a href="./waku.html">waku.html</a>
   </footer>
 
