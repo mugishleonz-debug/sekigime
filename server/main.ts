@@ -16,6 +16,8 @@ interface Store {
   addAttempt(a: Attempt): Promise<void>;
   listAttempts(): Promise<Attempt[]>;
   clearAttempts(): Promise<void>;
+  getBoard(): Promise<unknown>;
+  setBoard(v: unknown): Promise<void>;
 }
 
 async function makeStore(): Promise<Store> {
@@ -34,11 +36,14 @@ async function makeStore(): Promise<Store> {
       async clearAttempts() {
         for await (const e of kv.list({ prefix: ["attempt"] })) await kv.delete(e.key);
       },
+      async getBoard() { return (await kv.get(["board"])).value ?? null; },
+      async setBoard(v) { await kv.set(["board"], v); },
     };
   } catch {
     console.warn("Deno KV が使えないためメモリ保存にフォールバックします");
     let unlocked = false;
     let attempts: Attempt[] = [];
+    let board: unknown = null;
     return {
       kind: "memory",
       getUnlocked: () => Promise.resolve(unlocked),
@@ -46,6 +51,8 @@ async function makeStore(): Promise<Store> {
       addAttempt: (a) => { attempts.push(a); return Promise.resolve(); },
       listAttempts: () => Promise.resolve([...attempts]),
       clearAttempts: () => { attempts = []; return Promise.resolve(); },
+      getBoard: () => Promise.resolve(board),
+      setBoard: (v) => { board = v; return Promise.resolve(); },
     };
   }
 }
@@ -84,7 +91,23 @@ export default {
       return json({ ok: true });
     }
 
+    // スマホ閲覧用: いまの確定状況(iPadが/syncで丸ごと上書きする掲示板)
+    if (path === "/board") {
+      return json({ data: await store.getBoard() });
+    }
+
     // ---- ここから幹事用(PIN必須) ----
+
+    // iPad用: 確定状況の丸ごと同期(iPadのlocalStorageが正、サーバーは写し)
+    if (path === "/sync" && req.method === "POST") {
+      const body = await req.json().catch(() => ({}));
+      if (body.pin !== PIN) return json({ error: "PINが違います" }, 403);
+      if (JSON.stringify(body.data ?? null).length > 50000) {
+        return json({ error: "データが大きすぎます" }, 413);
+      }
+      await store.setBoard(body.data ?? null);
+      return json({ ok: true });
+    }
 
     if (path === "/unlock" && req.method === "POST") {
       const { pin } = await req.json().catch(() => ({}));

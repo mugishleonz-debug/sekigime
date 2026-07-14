@@ -1,0 +1,749 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>席決めの儀 ☠️ iPad受付</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<style>
+  :root{
+    --ink:#0b0a08; --ink2:#151310;
+    --bone:#f2ead8; --bone-dim:#b8ad93;
+    --hazard:#f5c518; --blood:#e0483e; --gold:#e8b64c;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--ink); color:var(--bone);
+    font-family:"Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic",sans-serif;
+    min-height:100dvh; overflow-x:hidden;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:
+      radial-gradient(60% 45% at 50% 0%, rgba(245,197,24,.07), transparent 70%),
+      radial-gradient(80% 60% at 50% 110%, rgba(224,72,62,.08), transparent 70%);
+  }
+  #app{position:relative;z-index:1;max-width:820px;margin:0 auto;padding:0 28px 60px;min-height:100dvh}
+  .screen{display:none;animation:fadein .4s ease both}
+  .screen.on{display:block}
+  @keyframes fadein{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+  .tape{
+    position:fixed;left:0;right:0;height:28px;z-index:2;
+    background:repeating-linear-gradient(-45deg,var(--hazard) 0 20px,var(--ink) 20px 40px);
+  }
+  .tape.top{top:0;transform:rotate(-.6deg) scaleX(1.05)}
+  .tape.bottom{bottom:0;transform:rotate(.6deg) scaleX(1.05)}
+
+  /* ==== 待機画面 ==== */
+  #standby{padding-top:80px;text-align:center}
+  .skull{
+    font-size:130px;line-height:1;margin:20px 0 6px;display:inline-block;
+    filter:drop-shadow(0 0 26px rgba(245,197,24,.35));
+    animation:breathe 3.2s ease-in-out infinite;
+  }
+  @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+  h1{font-size:34px;font-weight:900;letter-spacing:.16em;margin:8px 0 4px}
+  .standby-sub{color:var(--bone-dim);font-size:16px;line-height:1.9;margin-bottom:8px}
+  .counter{
+    display:inline-block;margin:10px 0 26px;padding:8px 26px;border-radius:999px;
+    border:1.5px solid #3a352b;color:var(--gold);
+    font-size:18px;font-weight:900;letter-spacing:.15em;
+    font-variant-numeric:tabular-nums;
+  }
+  .btn{
+    appearance:none;border:none;cursor:pointer;border-radius:16px;
+    font-family:inherit;font-weight:900;letter-spacing:.1em;
+    transition:transform .08s ease;
+  }
+  .btn:active{transform:scale(.96)}
+  .btn-draw{
+    display:block;margin:0 auto;padding:28px 60px;font-size:30px;color:var(--ink);
+    background:linear-gradient(180deg,#f8dd8e,var(--gold));
+    box-shadow:0 10px 0 #7d5a14, 0 20px 50px rgba(232,182,76,.25);
+    animation:pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse{0%,100%{box-shadow:0 10px 0 #7d5a14, 0 20px 50px rgba(232,182,76,.2)}50%{box-shadow:0 10px 0 #7d5a14, 0 20px 70px rgba(232,182,76,.5)}}
+  .btn-ghost{padding:12px 22px;font-size:15px;color:var(--bone-dim);background:transparent;border:1.5px solid #3a352b}
+  .btn-gold{padding:16px 30px;font-size:18px;color:var(--ink);background:linear-gradient(180deg,#f6d98a,var(--gold));box-shadow:0 6px 0 #7d5a14}
+  .btn-blood{padding:12px 22px;font-size:15px;color:#fff;background:linear-gradient(180deg,#e0483e,#a32620);box-shadow:0 5px 0 #5e120e}
+  .standby-tools{margin-top:34px;display:flex;gap:14px;justify-content:center}
+  .done-banner{
+    font-size:26px;font-weight:900;color:var(--gold);letter-spacing:.2em;margin:20px 0;
+  }
+
+  /* ==== 名前選択 ==== */
+  #choose{padding-top:60px}
+  .kaikin{text-align:center;font-size:30px;font-weight:900;letter-spacing:.2em;color:var(--gold);margin:10px 0 4px;text-shadow:0 0 30px rgba(232,182,76,.4)}
+  .choose-sub{text-align:center;color:var(--bone-dim);font-size:15px;margin-bottom:18px}
+  #namefilter{
+    width:100%;padding:16px 18px;font-size:20px;color:var(--bone);
+    background:var(--ink2);border:2px solid #3a352b;border-radius:14px;outline:none;margin-bottom:16px;
+    font-family:inherit;
+  }
+  #namefilter:focus{border-color:var(--gold)}
+  .namegrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  @media (max-width:560px){.namegrid{grid-template-columns:1fr 1fr}}
+  .namebtn{
+    padding:20px 8px;font-size:18px;font-weight:700;color:var(--bone);
+    background:var(--ink2);border:1.5px solid #35301f;border-radius:14px;cursor:pointer;
+    font-family:inherit;
+  }
+  .namebtn:active{transform:scale(.95);border-color:var(--gold)}
+  .toolrow{display:flex;justify-content:center;gap:14px;margin:26px 0 0}
+
+  /* ==== スロット ==== */
+  #roll{padding-top:150px;text-align:center}
+  .roll-name{font-size:24px;font-weight:800;color:var(--bone-dim);letter-spacing:.1em}
+  .slot{
+    font-size:160px;font-weight:900;line-height:1.1;margin:24px 0;color:var(--gold);
+    text-shadow:0 0 50px rgba(232,182,76,.45);
+  }
+  .roll-label{font-size:18px;letter-spacing:.5em;color:var(--bone-dim)}
+
+  /* ==== 結果 ==== */
+  #result{padding-top:70px;text-align:center}
+  .res-name{font-size:26px;font-weight:800;margin-bottom:4px}
+  .res-order{font-size:14px;letter-spacing:.3em;color:var(--bone-dim);margin-bottom:6px}
+  .res-table{
+    font-size:170px;font-weight:900;line-height:1;margin:8px 0 2px;
+    background:linear-gradient(180deg,#ffe9ad,var(--gold) 60%,#a97b1e);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 4px 24px rgba(232,182,76,.35));
+    animation:pop .5s cubic-bezier(.2,2,.4,1) both;
+  }
+  @keyframes pop{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
+  .res-taku{font-size:32px;font-weight:900;letter-spacing:.3em;color:var(--gold);margin-bottom:24px}
+  .mates{
+    background:var(--ink2);border:1.5px solid #35301f;border-radius:18px;
+    padding:18px 22px;margin:0 auto 26px;max-width:560px;
+  }
+  .mates h3{margin:0 0 12px;font-size:13px;letter-spacing:.3em;color:var(--bone-dim);text-align:center}
+  .mates ul{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+  .mates li{font-size:17px;font-weight:700;padding:8px 16px;background:#1e1a13;border-radius:10px}
+  .mates li.me{color:var(--ink);background:var(--gold)}
+  .mates li.mystery{color:#6e6650;border:1.5px dashed #3a352b;background:transparent}
+  .auto-note{font-size:13px;color:var(--bone-dim)}
+
+  /* ==== 全卓一覧 ==== */
+  #all{padding-top:60px}
+  .all-title{text-align:center;font-size:26px;font-weight:900;letter-spacing:.2em;color:var(--gold);margin-bottom:20px}
+  .tablegrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media (max-width:640px){.tablegrid{grid-template-columns:1fr}}
+  .tablecard{background:var(--ink2);border:1.5px solid #35301f;border-radius:16px;padding:16px 18px}
+  .tablecard.wide{grid-column:1 / -1}
+  .tablecard h3{margin:0 0 10px;font-size:17px;font-weight:900;color:var(--gold);letter-spacing:.12em}
+  .tablecard ul{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:8px}
+  .tablecard li{font-size:15px;font-weight:700;padding:6px 14px;background:#1e1a13;border-radius:999px}
+  .tablecard li.mystery{color:#6e6650;border:1.5px dashed #3a352b;background:transparent}
+
+  /* ==== 幹事 ==== */
+  #admin{padding-top:60px;max-width:620px;margin:0 auto}
+  .codebox{display:flex;gap:12px;justify-content:center;margin:14px 0 30px}
+  input[type=tel]{
+    width:200px;padding:14px 16px;font-size:26px;letter-spacing:.4em;text-align:center;
+    font-weight:900;color:var(--bone);background:var(--ink2);
+    border:2px solid #3a352b;border-radius:12px;outline:none;font-family:inherit;
+  }
+  input[type=tel]:focus{border-color:var(--hazard)}
+  .btn-hazard{padding:14px 24px;font-size:16px;color:var(--ink);background:var(--hazard);box-shadow:0 6px 0 #8a6d05}
+  .adminmsg{min-height:30px;text-align:center;color:var(--blood);font-weight:700;font-size:14px}
+  .drawnrow{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:10px 16px;background:var(--ink2);border:1.5px solid #35301f;
+    border-radius:12px;margin-bottom:8px;font-size:16px;font-weight:700;
+  }
+  .drawnrow .t{color:var(--gold);margin-left:auto;margin-right:14px;font-size:14px}
+  .undo{padding:8px 14px;font-size:13px;color:#fff;background:#7a2620;border:none;border-radius:8px;font-family:inherit;font-weight:800;cursor:pointer}
+  .admin-h{font-size:14px;font-weight:900;letter-spacing:.3em;color:var(--bone-dim);text-align:center;margin:34px 0 14px}
+  .config-error{padding:120px 10px;text-align:center;color:var(--blood);font-weight:800;line-height:2;font-size:18px}
+  .warn-reset{padding:100px 20px;text-align:center;line-height:2.2}
+
+  canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:5}
+</style>
+</head>
+<body>
+
+<div class="tape top"></div>
+<div class="tape bottom"></div>
+<canvas id="confetti"></canvas>
+
+<div id="app">
+
+  <!-- ①待機(この画面をずっと表示しておく) -->
+  <section class="screen on" id="standby">
+    <div class="skull">☠️</div>
+    <h1>席決めの儀</h1>
+    <p class="standby-sub">ボタンを押して、運命の席を確定させよ。<br>早い者勝ちではない。だが逃げることもできない。</p>
+    <div class="counter"><span id="count">0</span> / <span id="total">40</span> 名 確定</div>
+    <div id="drawarea">
+      <button class="btn btn-draw" id="drawbtn">☠️ くじを引く ☠️</button>
+    </div>
+    <div class="standby-tools">
+      <button class="btn btn-ghost" id="allbtn">全卓一覧</button>
+      <button class="btn btn-ghost" id="adminbtn">幹事</button>
+    </div>
+  </section>
+
+  <!-- ②名前選択 -->
+  <section class="screen" id="choose">
+    <div class="kaikin">☠️ 名を名乗れ ☠️</div>
+    <p class="choose-sub">自分の名前を押すと、その瞬間に席が確定する。もう戻れない。</p>
+    <input id="namefilter" type="text" placeholder="名前で検索…" autocomplete="off">
+    <div class="namegrid" id="namegrid"></div>
+    <div class="toolrow">
+      <button class="btn btn-ghost" id="choosebackbtn">やっぱりやめる</button>
+    </div>
+  </section>
+
+  <!-- ③スロット -->
+  <section class="screen" id="roll">
+    <p class="roll-name" id="rollname"></p>
+    <div class="slot" id="slotnum">?</div>
+    <p class="roll-label">運命抽選中</p>
+  </section>
+
+  <!-- ④結果 -->
+  <section class="screen" id="result">
+    <p class="res-name" id="resname"></p>
+    <p class="res-order" id="resorder"></p>
+    <div class="res-table" id="resnum">1</div>
+    <p class="res-taku" id="restaku"></p>
+    <div class="mates">
+      <h3>いま確定している同卓の仲間</h3>
+      <ul id="mates"></ul>
+    </div>
+    <div class="toolrow">
+      <button class="btn btn-gold" id="nextbtn">OK! 次の人へ →</button>
+    </div>
+    <p class="auto-note" style="margin-top:14px">(<span id="autosec">15</span>秒後に自動で戻ります)</p>
+  </section>
+
+  <!-- ⑤全卓一覧(確定者のみ表示、未確定は???) -->
+  <section class="screen" id="all">
+    <div class="all-title">— 全卓一覧 —</div>
+    <div class="tablegrid" id="tablelist"></div>
+    <div class="toolrow">
+      <button class="btn btn-ghost" id="allbackbtn">もどる</button>
+    </div>
+  </section>
+
+  <!-- ⑥幹事メニュー(PIN) -->
+  <section class="screen" id="admin">
+    <div class="all-title">— 幹事メニュー —</div>
+    <div id="adminlogin" class="toolrow" style="flex-direction:column;align-items:center">
+      <div class="codebox">
+        <input type="tel" id="adminpin" maxlength="8" placeholder="PIN" autocomplete="off">
+        <button class="btn btn-hazard" id="adminloginbtn">入る</button>
+      </div>
+      <div class="adminmsg" id="adminmsg"></div>
+    </div>
+    <div id="adminmain" style="display:none">
+      <h3 class="admin-h">スマホ座席ボードへの同期</h3>
+      <p class="choose-sub" id="syncstatus"></p>
+      <div class="codebox">
+        <input type="tel" id="serverpin" maxlength="8" placeholder="サーバーPIN" autocomplete="off">
+        <button class="btn btn-hazard" id="serverpinbtn">保存して同期</button>
+      </div>
+      <h3 class="admin-h">確定履歴(間違えて引いた分はここで取り消し)</h3>
+      <div id="drawnlist"></div>
+      <h3 class="admin-h">危険地帯</h3>
+      <div class="toolrow">
+        <button class="btn btn-blood" id="resetbtn">全リセット(抽選やり直し)</button>
+      </div>
+    </div>
+    <div class="toolrow">
+      <button class="btn btn-ghost" id="adminbackbtn">もどる</button>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* ================================================================
+   ★★★ 幹事が編集するのはここだけ ★★★
+   ---------------------------------------------------------------
+   iPad受付方式:
+     会場に置いたiPad(この1台だけ)で、来た人から順に
+     「くじを引く→名前を押す→席確定」していく。
+     全席の割り当ては裏で最初に1回だけ抽選済み(条件付きランダム)で、
+     名前を押した瞬間にその人のぶんだけが開示される。
+     → まだ引いていない人の席は誰にも(幹事にも)見えないので、
+       くじのドキドキは最後の1人まで保たれる。
+
+   ADMIN_PIN : このiPadの幹事メニュー(取り消し・リセット)用PIN。
+   SERVER    : 確定状況をスマホ向け「座席ボード」(index.html)に
+               映すためのサーバーURL。同期にはサーバー用PIN
+               (幹事メニューで一度だけ入力、端末に保存)が必要。
+               "" にするとiPad単体モード(同期なし)。
+   TABLES / GUESTS / FIXED / PAIRS / MIX : 従来と同じ意味。
+     TABLES  卓の枠(groom=新郎側, bride=新婦側。brideを1にしない)
+     GUESTS  名簿(g:"M"/"F", s:"郎"/"婦")
+     FIXED   席固定の人(幹事)。最初から確定扱いになる
+     PAIRS   必ず同卓の2人組
+     MIX     全卓の男女下限(卓別に minF/minM で上書き可)
+   ※名簿や枠を変更すると安全のため自動で全リセットがかかる
+     (確定済みの席とズレるのを防ぐため)。変更は受付開始前に。
+   ================================================================ */
+const CONFIG = {
+  ADMIN_PIN: "1122",
+  SERVER: "https://sekigime.mugishleonz-debug.deno.net",
+
+  TABLES: [
+    {name:"1卓",  groom:3, bride:2},
+    {name:"2卓",  groom:3, bride:2},
+    {name:"3卓",  groom:3, bride:2},
+    {name:"4卓",  groom:3, bride:2},
+    {name:"5卓",  groom:5, bride:0},
+    {name:"6卓",  groom:5, bride:0},
+    {name:"大卓", groom:6, bride:4, minF:3, minM:3},
+  ],
+
+  GUESTS: [
+    // --- 新郎側 男性 19人(うち幹事2人はFIXEDで席固定) ---
+    {n:"佐藤 健太",  g:"M", s:"郎"}, {n:"高橋 大輔",  g:"M", s:"郎"},
+    {n:"伊藤 翔太",  g:"M", s:"郎"}, {n:"山本 拓也",  g:"M", s:"郎"},
+    {n:"小林 亮",    g:"M", s:"郎"}, {n:"吉田 悠人",  g:"M", s:"郎"},
+    {n:"佐々木 蓮",  g:"M", s:"郎"}, {n:"松本 一樹",  g:"M", s:"郎"},
+    {n:"木村 俊介",  g:"M", s:"郎"}, {n:"斎藤 貴之",  g:"M", s:"郎"},
+    {n:"山崎 直人",  g:"M", s:"郎"}, {n:"池田 圭吾",  g:"M", s:"郎"},
+    {n:"阿部 慎二",  g:"M", s:"郎"}, {n:"中島 剛",    g:"M", s:"郎"},
+    {n:"藤田 淳",    g:"M", s:"郎"}, {n:"岡田 光",    g:"M", s:"郎"},
+    {n:"村上 竜也",  g:"M", s:"郎"}, {n:"石井 智也",  g:"M", s:"郎"},
+    {n:"遠藤 勇気",  g:"M", s:"郎"},
+    // --- 新郎側 女性 9人 ---
+    {n:"鈴木 美咲",  g:"F", s:"郎"}, {n:"田中 由紀",  g:"F", s:"郎"},
+    {n:"渡辺 彩香",  g:"F", s:"郎"}, {n:"中村 千夏",  g:"F", s:"郎"},
+    {n:"加藤 真央",  g:"F", s:"郎"}, {n:"山田 沙織",  g:"F", s:"郎"},
+    {n:"山口 恵里",  g:"F", s:"郎"}, {n:"井上 菜々",  g:"F", s:"郎"},
+    {n:"林 美穂",    g:"F", s:"郎"},
+    // --- 新婦側 男性 2人 ---
+    {n:"西村 徹",    g:"M", s:"婦"}, {n:"青木 拓海",  g:"M", s:"婦"},
+    // --- 新婦側 女性 10人 ---
+    {n:"清水 楓",    g:"F", s:"婦"}, {n:"森 亜美",    g:"F", s:"婦"},
+    {n:"橋本 里奈",  g:"F", s:"婦"}, {n:"石川 遥",    g:"F", s:"婦"},
+    {n:"前田 詩織",  g:"F", s:"婦"}, {n:"後藤 明日香",g:"F", s:"婦"},
+    {n:"長谷川 舞",  g:"F", s:"婦"}, {n:"近藤 早紀",  g:"F", s:"婦"},
+    {n:"福田 のぞみ",g:"F", s:"婦"}, {n:"坂本 香奈",  g:"F", s:"婦"},
+  ],
+
+  FIXED: [
+    {n:"佐藤 健太", t:4},   // 幹事A → 5卓
+    {n:"高橋 大輔", t:5},   // 幹事B → 6卓
+  ],
+
+  PAIRS: [
+    // 例: ["西村 徹", "青木 拓海"],
+  ],
+
+  MIX: { minF:1, minM:1 },
+};
+/* ================================================================ */
+
+/* ---- シード付き乱数と抽選エンジン(index.htmlと同一ロジック) ---- */
+function xmur3(str){
+  let h = 1779033703 ^ str.length;
+  for(let i=0;i<str.length;i++){
+    h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+    h = (h << 13) | (h >>> 19);
+  }
+  return ()=>{ h = Math.imul(h ^ (h>>>16), 2246822507);
+               h = Math.imul(h ^ (h>>>13), 3266489909);
+               return (h ^= h>>>16) >>> 0; };
+}
+function mulberry32(a){
+  return ()=>{ a |= 0; a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a>>>15), 1 | a);
+    t = (t + Math.imul(t ^ (t>>>7), 61 | t)) ^ t;
+    return ((t ^ (t>>>14)) >>> 0) / 4294967296; };
+}
+function shuffled(arr, rand){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(rand()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+function drawTables(seed){
+  const fixedNames = new Set(CONFIG.FIXED.map(f=>f.n));
+  const groomAll = CONFIG.GUESTS.filter(p=>p.s==="郎" && !fixedNames.has(p.n));
+  const brideAll = CONFIG.GUESTS.filter(p=>p.s==="婦" && !fixedNames.has(p.n));
+  const byName = new Map(CONFIG.GUESTS.map(p=>[p.n,p]));
+  for(let salt=0; salt<50000; salt++){
+    const rand = mulberry32(xmur3(seed + "#" + salt)());
+    const groomPool = shuffled(groomAll, rand);
+    const bridePool = shuffled(brideAll, rand);
+    const tables = CONFIG.TABLES.map(()=>[]);
+    const need = CONFIG.TABLES.map(t=>({groom:t.groom, bride:t.bride}));
+    for(const f of CONFIG.FIXED){
+      const p = byName.get(f.n);
+      tables[f.t].push(p);
+      need[f.t][p.s==="郎" ? "groom" : "bride"]--;
+    }
+    let gi = 0, bi = 0;
+    for(let t=0;t<tables.length;t++){
+      for(let k=0;k<need[t].groom;k++) tables[t].push(groomPool[gi++]);
+      for(let k=0;k<need[t].bride;k++) tables[t].push(bridePool[bi++]);
+    }
+    const mixOk = tables.every((tab,ti) =>
+      tab.filter(p=>p.g==="F").length >= (CONFIG.TABLES[ti].minF ?? CONFIG.MIX.minF) &&
+      tab.filter(p=>p.g==="M").length >= (CONFIG.TABLES[ti].minM ?? CONFIG.MIX.minM)
+    );
+    if(!mixOk) continue;
+    const tableIdxOf = name => tables.findIndex(tab => tab.some(p=>p.n===name));
+    const pairsOk = CONFIG.PAIRS.every(([a,b]) =>
+      tableIdxOf(a) !== -1 && tableIdxOf(a) === tableIdxOf(b)
+    );
+    if(!pairsOk) continue;
+    return tables;
+  }
+  return null;
+}
+
+/* ---- 端末内の状態(このiPadだけが真実) ----
+   seed  : この回の抽選シード(リセットのたびに乱数で作り直す)
+   drawn : 確定した人 [{n, ts}] の配列(確定順)
+   fp    : CONFIGの指紋。名簿や枠が変わったら自動リセットして事故防止 */
+const LS_KEY = "sekigime_ipad_state";
+function configFingerprint(){
+  return String(xmur3(JSON.stringify([CONFIG.TABLES, CONFIG.GUESTS, CONFIG.FIXED, CONFIG.PAIRS, CONFIG.MIX]))());
+}
+function newSeed(){
+  const buf = new Uint32Array(4);
+  crypto.getRandomValues(buf);
+  return [...buf].map(x=>x.toString(36)).join("-");
+}
+function loadState(){
+  try{
+    const s = JSON.parse(localStorage.getItem(LS_KEY));
+    if(s && s.fp === configFingerprint() && typeof s.seed === "string" && Array.isArray(s.drawn)) return s;
+  }catch(e){}
+  return null;
+}
+function saveState(){ localStorage.setItem(LS_KEY, JSON.stringify(state)); }
+let state = loadState();
+const configChanged = !state && !!localStorage.getItem(LS_KEY);
+if(!state){
+  state = { seed: newSeed(), drawn: [], fp: configFingerprint() };
+  saveState();
+}
+
+/* ---- 画面まわり ---- */
+const $ = id => document.getElementById(id);
+let tables = null;
+
+function show(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("on"));
+  $(id).classList.add("on");
+  window.scrollTo(0,0);
+}
+
+/* 設定ミスの検知 */
+(function validate(){
+  const errs = [];
+  const names = new Set(CONFIG.GUESTS.map(p=>p.n));
+  if(names.size !== CONFIG.GUESTS.length) errs.push("名簿に同姓同名がいます(区別できるよう表記を変えてください)");
+  const groomN = CONFIG.GUESTS.filter(p=>p.s==="郎").length;
+  const brideN = CONFIG.GUESTS.filter(p=>p.s==="婦").length;
+  const quotaG = CONFIG.TABLES.reduce((a,t)=>a+t.groom,0);
+  const quotaB = CONFIG.TABLES.reduce((a,t)=>a+t.bride,0);
+  if(groomN !== quotaG) errs.push(`新郎側: 名簿${groomN}名 ≠ 卓の枠合計${quotaG}名`);
+  if(brideN !== quotaB) errs.push(`新婦側: 名簿${brideN}名 ≠ 卓の枠合計${quotaB}名`);
+  CONFIG.TABLES.forEach(t=>{ if(t.bride === 1) errs.push(`${t.name}: 新婦側が1人だけの枠はNG(0か2以上に)`); });
+  CONFIG.FIXED.forEach(f=>{
+    if(!names.has(f.n)) errs.push(`FIXED「${f.n}」が名簿にいません`);
+    if(!(f.t >= 0 && f.t < CONFIG.TABLES.length)) errs.push(`FIXED「${f.n}」の卓番号 ${f.t} が不正です`);
+  });
+  CONFIG.PAIRS.forEach(pr=>{ pr.forEach(n=>{ if(!names.has(n)) errs.push(`PAIRS「${n}」が名簿にいません`); }); });
+  if(errs.length === 0){
+    tables = drawTables(state.seed);
+    if(!tables) errs.push("枠・男女下限(MIX)・PAIRSの条件がきつすぎて、抽選が成立しません");
+  }
+  if(errs.length){
+    $("app").innerHTML = `<div class="config-error">⚠️ 設定エラー<br>${errs.join("<br>")}</div>`;
+    throw new Error("config error");
+  }
+})();
+
+const FIXED_NAMES = new Set(CONFIG.FIXED.map(f=>f.n));
+const drawnSet = () => new Set(state.drawn.map(d=>d.n));
+const confirmedSet = () => new Set([...FIXED_NAMES, ...state.drawn.map(d=>d.n)]);
+function tableOf(name){
+  return tables.findIndex(tab => tab.some(p=>p.n===name));
+}
+
+/* ---- サーバー同期(スマホの座席ボードに映す) ----
+   iPadのlocalStorageが常に正。変更のたびに確定状況を丸ごと送るので、
+   サーバーが再起動して消えても次の同期で自動復旧する。 */
+const PIN_KEY = "sekigime_ipad_server_pin";
+const getServerPin = () => localStorage.getItem(PIN_KEY) || "";
+let lastSync = null;  // null=未試行, true=成功, false=失敗
+function boardPayload(){
+  const conf = [];
+  CONFIG.FIXED.forEach(f => conf.push({ n:f.n, t:f.t, ts:0 }));
+  state.drawn.forEach(d => conf.push({ n:d.n, t:tableOf(d.n), ts:d.ts }));
+  return {
+    tables: CONFIG.TABLES.map(t => ({ name:t.name, size:t.groom + t.bride })),
+    board: conf,
+    total: CONFIG.GUESTS.length,
+    updated: Date.now(),
+  };
+}
+async function syncBoard(){
+  const pin = getServerPin();
+  if(!CONFIG.SERVER || !pin) return;
+  try{
+    const r = await fetch(CONFIG.SERVER + "/sync", {
+      method:"POST", headers:{"content-type":"application/json"},
+      body: JSON.stringify({ pin, data: boardPayload() }),
+    });
+    lastSync = r.ok;
+  }catch(e){ lastSync = false; }
+  renderSyncStatus();
+}
+function renderSyncStatus(){
+  const el = $("syncstatus");
+  if(!el) return;
+  if(!CONFIG.SERVER)       el.textContent = "同期: オフ(単体モード)";
+  else if(!getServerPin()) el.textContent = "同期: 未設定 — サーバーPINを保存してください";
+  else if(lastSync === true)  el.textContent = "同期: ✅ スマホの座席ボードに反映中";
+  else if(lastSync === false) el.textContent = "同期: ⚠️ 失敗(電波・PINを確認)";
+  else                        el.textContent = "同期: 確認中…";
+}
+
+/* ---- 待機画面 ---- */
+function renderStandby(){
+  const total = CONFIG.GUESTS.length;
+  const confirmed = confirmedSet().size;
+  $("count").textContent = confirmed;
+  $("total").textContent = total;
+  if(confirmed >= total){
+    $("drawarea").innerHTML = `<div class="done-banner">🎉 全席確定! 🎉</div>
+      <button class="btn btn-gold" id="donebtn">全卓一覧を見る</button>`;
+    $("donebtn").addEventListener("click", ()=>{ buildAllTables(); show("all"); });
+  }
+  show("standby");
+}
+$("drawbtn").addEventListener("click", ()=>{ buildNameGrid(); $("namefilter").value=""; show("choose"); });
+$("allbtn").addEventListener("click", ()=>{ buildAllTables(); show("all"); });
+$("allbackbtn").addEventListener("click", renderStandby);
+$("choosebackbtn").addEventListener("click", renderStandby);
+
+/* ---- 名前選択(まだ引いていない人だけ表示) ---- */
+function buildNameGrid(filter=""){
+  const grid = $("namegrid");
+  grid.innerHTML = "";
+  const taken = confirmedSet();
+  CONFIG.GUESTS
+    .filter(p => !taken.has(p.n))
+    .filter(p => p.n.replace(/\s/g,"").includes(filter.replace(/\s/g,"")))
+    .forEach(p=>{
+      const b = document.createElement("button");
+      b.className = "namebtn";
+      b.textContent = p.n;
+      b.addEventListener("click", ()=> confirmSeat(p.n));
+      grid.appendChild(b);
+    });
+}
+$("namefilter").addEventListener("input", e=> buildNameGrid(e.target.value));
+
+/* ---- 確定(スロット→結果) ---- */
+let autoTimer = null, autoTick = null;
+function confirmSeat(name){
+  if(confirmedSet().has(name)) { renderStandby(); return; }  // 二重タップ防止
+  state.drawn.push({ n:name, ts: Date.now() });
+  saveState();
+  syncBoard();
+  const t = tableOf(name);
+  $("rollname").textContent = name + " さん";
+  show("roll");
+  const slot = $("slotnum");
+  let ticks = 0;
+  const iv = setInterval(()=>{
+    const r = CONFIG.TABLES[Math.floor(Math.random()*CONFIG.TABLES.length)];
+    slot.textContent = r.name.replace(/卓$/,"");
+    ticks++;
+    if(ticks > 22){ clearInterval(iv); showResult(name, t); }
+  }, 80 + ticks);
+  navigator.vibrate && navigator.vibrate([30,50,30]);
+}
+function showResult(name, t){
+  const tbl = CONFIG.TABLES[t];
+  const conf = confirmedSet();
+  $("resname").textContent = name + " さん";
+  $("resorder").textContent = `${conf.size} 人目の確定`;
+  $("resnum").textContent = tbl.name.replace(/卓$/,"");
+  $("restaku").textContent = tbl.name + `(${tbl.groom + tbl.bride}名)`;
+  const ul = $("mates"); ul.innerHTML = "";
+  let mystery = 0;
+  tables[t].forEach(p=>{
+    if(p.n === name){
+      const li = document.createElement("li");
+      li.className = "me"; li.textContent = p.n;
+      ul.appendChild(li);
+    }else if(conf.has(p.n)){
+      const li = document.createElement("li");
+      li.textContent = p.n;
+      ul.appendChild(li);
+    }else{
+      mystery++;
+    }
+  });
+  if(mystery > 0){
+    const li = document.createElement("li");
+    li.className = "mystery";
+    li.textContent = `??? × ${mystery}(まだ運命待ち)`;
+    ul.appendChild(li);
+  }
+  show("result");
+  burstConfetti(220);
+  navigator.vibrate && navigator.vibrate(120);
+  // 置きっぱなし運用なので自動で待機画面に戻る
+  let sec = 15;
+  $("autosec").textContent = sec;
+  clearInterval(autoTick); clearTimeout(autoTimer);
+  autoTick = setInterval(()=>{ sec--; $("autosec").textContent = Math.max(sec,0); }, 1000);
+  autoTimer = setTimeout(()=>{ clearInterval(autoTick); renderStandby(); }, sec*1000);
+}
+$("nextbtn").addEventListener("click", ()=>{
+  clearInterval(autoTick); clearTimeout(autoTimer);
+  renderStandby();
+});
+
+/* ---- 全卓一覧(確定者のみ。未確定は???で隠してネタバレ防止) ---- */
+function buildAllTables(){
+  const wrap = $("tablelist"); wrap.innerHTML = "";
+  const conf = confirmedSet();
+  tables.forEach((tab,i)=>{
+    const card = document.createElement("div");
+    card.className = "tablecard" + (tab.length > 6 ? " wide" : "");
+    card.innerHTML = `<h3>🍾 ${CONFIG.TABLES[i].name}(${tab.length}名)</h3>`;
+    const ul = document.createElement("ul");
+    tab.forEach(p=>{
+      const li = document.createElement("li");
+      if(conf.has(p.n)){ li.textContent = p.n; }
+      else{ li.className = "mystery"; li.textContent = "???"; }
+      ul.appendChild(li);
+    });
+    card.appendChild(ul);
+    wrap.appendChild(card);
+  });
+}
+
+/* ---- 幹事メニュー ---- */
+$("adminbtn").addEventListener("click", ()=>{
+  $("adminpin").value = ""; $("adminmsg").textContent = "";
+  $("adminlogin").style.display = ""; $("adminmain").style.display = "none";
+  show("admin");
+});
+function adminLogin(){
+  if($("adminpin").value.trim() !== CONFIG.ADMIN_PIN){
+    $("adminmsg").textContent = "PINが違います";
+    return;
+  }
+  $("adminlogin").style.display = "none";
+  $("adminmain").style.display = "block";
+  renderSyncStatus();
+  buildDrawnList();
+}
+$("adminloginbtn").addEventListener("click", adminLogin);
+$("adminpin").addEventListener("keydown", e=>{ if(e.key==="Enter") adminLogin(); });
+$("adminbackbtn").addEventListener("click", renderStandby);
+
+function buildDrawnList(){
+  const wrap = $("drawnlist"); wrap.innerHTML = "";
+  if(state.drawn.length === 0){
+    wrap.innerHTML = `<p class="choose-sub">まだ誰も引いていません</p>`;
+    return;
+  }
+  state.drawn.forEach((d,idx)=>{
+    const row = document.createElement("div");
+    row.className = "drawnrow";
+    const name = document.createElement("span");
+    name.textContent = `${idx+1}. ${d.n}`;
+    const taku = document.createElement("span");
+    taku.className = "t";
+    taku.textContent = CONFIG.TABLES[tableOf(d.n)].name;
+    const undo = document.createElement("button");
+    undo.className = "undo";
+    undo.textContent = "取り消し";
+    undo.addEventListener("click", ()=>{
+      state.drawn.splice(idx, 1);
+      saveState();
+      syncBoard();
+      buildDrawnList();
+    });
+    row.append(name, taku, undo);
+    wrap.appendChild(row);
+  });
+}
+let resetArmed = false;
+$("resetbtn").addEventListener("click", ()=>{
+  if(!resetArmed){
+    resetArmed = true;
+    $("resetbtn").textContent = "本当に全部やり直す(もう一度押す)";
+    setTimeout(()=>{ resetArmed=false; $("resetbtn").textContent="全リセット(抽選やり直し)"; }, 4000);
+    return;
+  }
+  resetArmed = false;
+  $("resetbtn").textContent = "全リセット(抽選やり直し)";
+  state = { seed: newSeed(), drawn: [], fp: configFingerprint() };
+  saveState();
+  tables = drawTables(state.seed);
+  syncBoard();
+  renderStandby();
+});
+$("serverpinbtn").addEventListener("click", async ()=>{
+  const pin = $("serverpin").value.trim();
+  if(!pin) return;
+  localStorage.setItem(PIN_KEY, pin);
+  lastSync = null; renderSyncStatus();
+  await syncBoard();
+  if(lastSync === false) $("adminmsg").textContent = "同期に失敗しました(PINまたは電波を確認)";
+  else $("adminmsg").textContent = "";
+});
+
+/* ---- 紙吹雪 ---- */
+const cvs = $("confetti"), ctx = cvs.getContext("2d");
+let parts = [], rafId = null;
+function sizeCanvas(){ cvs.width = innerWidth; cvs.height = innerHeight; }
+addEventListener("resize", sizeCanvas); sizeCanvas();
+const COLORS = ["#e8b64c","#f2ead8","#ff5d8f","#7ec8e3","#b7e07a"];
+function burstConfetti(n){
+  for(let i=0;i<n;i++){
+    parts.push({
+      x: Math.random()*cvs.width, y: -20 - Math.random()*cvs.height*.3,
+      w: 6+Math.random()*7, h: 8+Math.random()*9,
+      vy: 2+Math.random()*3.5, vx: -1.5+Math.random()*3,
+      rot: Math.random()*Math.PI, vr: -.15+Math.random()*.3,
+      c: COLORS[i%COLORS.length],
+    });
+  }
+  if(!rafId) tick();
+}
+function tick(){
+  ctx.clearRect(0,0,cvs.width,cvs.height);
+  parts = parts.filter(p=>p.y < cvs.height+20);
+  parts.forEach(p=>{
+    p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr;
+    ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot);
+    ctx.fillStyle=p.c; ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); ctx.restore();
+  });
+  rafId = parts.length ? requestAnimationFrame(tick) : null;
+}
+
+/* ---- 起動 ---- */
+if(configChanged){
+  // 名簿・枠の変更を検知して自動リセットした旨を一度だけ表示
+  const note = document.createElement("p");
+  note.className = "standby-sub";
+  note.style.color = "#e0483e";
+  note.textContent = "⚠️ 名簿または枠が変更されたため、抽選をリセットしました";
+  $("standby").insertBefore(note, $("drawarea"));
+}
+renderStandby();
+syncBoard();  // 起動時にも送っておく(サーバー再起動後の自動復旧を兼ねる)
+</script>
+</body>
+</html>

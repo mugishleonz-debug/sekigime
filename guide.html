@@ -58,6 +58,8 @@
     border-radius:22px;border:5px solid #141210;
     box-shadow:0 10px 30px rgba(20,18,16,.25);
   }
+  .shot.pad{width:min(330px,80vw)}
+  .shot.flat{border-radius:12px;border:1.5px solid var(--line);box-shadow:0 6px 20px rgba(20,18,16,.12);width:min(420px,90vw)}
   .shots2{display:flex;gap:16px;flex-wrap:wrap}
   .shots2 figure{margin:14px 0 4px}
   .shots2 .shot{margin:0}
@@ -96,140 +98,123 @@
 <header>
   <div class="skull">☠️</div>
   <h1>「席決めの儀」使い方ガイド</h1>
-  <p>結婚式二次会・席決め抽選アプリ — ゲストも幹事もこれ1枚でOK</p>
+  <p>結婚式二次会・席決め抽選 — 会場のiPadでくじを引く方式</p>
 </header>
 
 <div class="wrap">
 
   <h2><span class="en">ABOUT</span>これは何?</h2>
-  <p class="lead">全員のスマホで同時に席の抽選結果がわかるアプリです。幹事がOKを出すまでは、ドクロの封印がかかっていて誰も結果を見られません。</p>
+  <p class="lead">受付に置かれたiPadで、来た人から順番にくじを引いて席を確定させていく抽選アプリです。引くまで自分の席は誰にもわかりません(幹事にも、機械の中の運命だけが知っています)。</p>
   <div class="callout">
     <b class="title">🎲 抽選のしくみ(安心ポイント)</b>
-    結果はサーバーに保存されるのではなく、全員のスマホの中で同じ計算式から生まれます。だから<b>いつ開いても・誰のスマホで見ても、必ず同じ結果</b>。遅刻しても電池が切れても、席がなくなることはありません。<br><br>
-    抽選は<b>「条件付きランダム」</b>です。各卓の新郎側・新婦側の人数バランスや男女の偏りは事前に調整されていて、その枠の中で<b>誰がどの卓になるかは完全ランダム</b>。「知らない人ばかりで気まずい卓」ができないよう設計しつつ、くじ引きのドキドキはそのまま残しています。
+    くじは<b>「条件付きランダム」</b>です。各卓の新郎側・新婦側の人数バランスや男女の偏りは事前の「枠」で調整済みで、その枠の中で<b>誰がどの卓になるかは完全ランダム</b>。「新婦側が1人ぼっち」「知らない人だらけで気まずい卓」ができないように設計しつつ、くじ引きのドキドキはそのまま残しています。<br>
+    まだ引いていない人の席は画面にも「???」としか出ないので、最後の1人までネタバレしません。
   </div>
 
-  <h2><span class="en">FOR GUESTS</span>ゲストのつかいかた(4ステップ)</h2>
-  <p class="lead">やることは「開いて、名乗って、待つ」だけです。</p>
+  <h2><span class="en">FOR GUESTS</span>ゲストのながれ(3ステップ)</h2>
+  <p class="lead">やることは「iPadで名前を押す」だけ。スマホでは今の席の埋まり具合がいつでも見られます。</p>
 
   <div class="step">
     <div class="stepnum">1</div>
     <div class="steptext">
-      <h3>招待QRコード(またはURL)をスマホで開く</h3>
-      <p>最初に <b>自分の名前</b> を一覧から選びます。検索欄に名前の一部を入れるとすぐ見つかります。</p>
-      <p class="note">⚠️ 他人の名前を選ぶのはやめましょう。フライング通報がその人の名前で記録されてしまいます(=罰が下ります)。</p>
-      <img class="shot" src="img/1_who.png" alt="名前を選ぶ画面">
+      <h3>受付のiPadで「☠️ くじを引く ☠️」を押す</h3>
+      <p>会場に着いたら受付のiPadへ。金のボタンを押すと名前の一覧が出ます。</p>
+      <img class="shot pad" src="img/ipad_1_standby.png" alt="iPadの待機画面">
     </div>
   </div>
 
   <div class="step">
     <div class="stepnum">2</div>
     <div class="steptext">
-      <h3>ドクロの封印画面のまま、幹事の合図を待つ</h3>
-      <p>この画面が出たら準備完了。<b>何もしなくてOK</b>です。幹事がボタンを押すと、封印はひとりでに解けます。</p>
-      <img class="shot" src="img/2_lock.png" alt="ドクロの封印画面">
+      <h3>自分の名前をタップ — その瞬間、席が確定</h3>
+      <p>名前を押すとスロットが回り、運命の卓が発表されます。<b>もう変更はできません。</b>すでに確定している同卓の仲間も表示されます(まだの人は「???」)。</p>
+      <p class="note">⚠️ 他人の名前を押さないこと。幹事しか取り消せません。</p>
+      <div class="shots2">
+        <figure>
+          <img class="shot pad" src="img/ipad_2_choose.png" alt="名前選択画面">
+          <figcaption>自分の名前をタップ</figcaption>
+        </figure>
+        <figure>
+          <img class="shot pad" src="img/ipad_3_result.png" alt="席確定画面">
+          <figcaption>スロットの後、席が確定!</figcaption>
+        </figure>
+      </div>
     </div>
   </div>
 
   <div class="step">
     <div class="stepnum">3</div>
     <div class="steptext">
-      <h3>先に開けようとすると……</h3>
-      <p>コードを当てずっぽうで入れると、ドクロが怒ります。そして<b>その試みは名前つきで幹事に通報され、結果画面に「検挙スタンプ」が押されます</b>。罰ゲームが待っています。</p>
-      <div class="shots2">
-        <figure>
-          <img class="shot" src="img/3_lock_angry.png" alt="ドクロが怒った画面">
-          <figcaption>フライングを試みた瞬間</figcaption>
-        </figure>
-        <figure>
-          <img class="shot" src="img/5_reveal_stamp.png" alt="検挙スタンプつきの結果画面">
-          <figcaption>結果画面に検挙スタンプ…</figcaption>
-        </figure>
-      </div>
-    </div>
-  </div>
-
-  <div class="step">
-    <div class="stepnum">4</div>
-    <div class="steptext">
-      <h3>解禁!スロットが回って運命の卓が判明</h3>
-      <p>幹事がOKを出すと自動でスロット演出がはじまり、あなたの卓番号と「同じ卓の仲間」が表示されます。</p>
-      <div class="shots2">
-        <figure>
-          <img class="shot" src="img/4_roll.png" alt="スロット演出">
-          <figcaption>運命抽選中…</figcaption>
-        </figure>
-        <figure>
-          <img class="shot" src="img/5_reveal.png" alt="結果画面">
-          <figcaption>フライングしなかった人には「良い子の証」</figcaption>
-        </figure>
-      </div>
+      <h3>スマホで「座席ボード」を見る</h3>
+      <p>招待QRコードのページ(スマホ)には、<b>いま確定している全員の席</b>がリアルタイムで表示されます。まだ引いていない人の席は「???」。自分の名前で検索すると光ります。</p>
+      <img class="shot" src="img/board_1.png" alt="スマホの座席ボード">
     </div>
   </div>
 
   <h2><span class="en">TROUBLE</span>困ったときは</h2>
   <dl class="qa">
-    <dt>スマホの電池が切れた!</dt>
-    <dd>となりの人の画面で「全卓一覧」ボタンを押してもらえば、全員の席が見られます。結果は誰のスマホでも同じなので大丈夫。幹事の端末でも確認できます。</dd>
-    <dt>遅刻してまだ会場に着いていない…</dt>
-    <dd>問題ありません。何時に開いても同じ結果が出ます。着いたらURLを開くだけです。</dd>
-    <dt>名前をまちがえて選んでしまった</dt>
-    <dd>封印画面の下にある「名前をまちがえた」を押すと選び直せます。</dd>
-    <dt>電波が悪くて自動で解禁されない</dt>
-    <dd>幹事がマイクで発表する「解禁コード」を封印画面に入力すれば開きます(予備の手段です)。</dd>
+    <dt>間違えて他人の名前を押してしまった!</dt>
+    <dd>正直に幹事へ。幹事メニューからその1件だけ取り消せます(その人はまた引き直せます)。</dd>
+    <dt>スマホの電池が切れた/持っていない</dt>
+    <dd>座席ボードは誰のスマホでも同じものが見られます。隣の人に見せてもらうか、iPadの「全卓一覧」でも確認できます。</dd>
+    <dt>遅刻して受付終了後に着いた…</dt>
+    <dd>問題ありません。着いたときにiPadで引けばOK。あなたの席はちゃんと空けてあります。</dd>
+    <dt>ボードが「???」だらけなんだけど</dt>
+    <dd>それはまだ引いていない人の席です。全員が引き終わると全部の名前が揃います。</dd>
   </dl>
-  <img class="shot" src="img/6_all.png" alt="全卓一覧画面">
-  <p class="note" style="font-size:13px;color:var(--dim)">▲「全卓一覧」— 誰のスマホからでも全員分が見られる(電池切れ救済用)</p>
+
+  <h2><span class="en">FRAME</span>席の枠(関係者向け)</h2>
+  <p class="lead">「どの卓に・どちら側が・何人入るか」の設計図です。新郎新婦・幹事間の確認用に、この画像をそのままLINEなどで共有できます(<a href="waku.html">waku.html</a> でも見られます)。</p>
+  <img class="shot flat" src="img/waku.png" alt="席の枠 早わかり図">
 
   <h2><span class="en">FOR ORGANIZER</span>幹事のつかいかた</h2>
 
   <p><span class="pill">事前準備</span></p>
   <ul>
-    <li><code>index.html</code> の <code>CONFIG</code> を設定する: ゲスト名簿(名前+性別+新郎側/新婦側)、各卓の枠(新郎側・新婦側を何人ずつ入れるか)、幹事の固定席(FIXED)、必ず同卓にしたいペア(PAIRS)。</li>
-    <li>枠の合計と名簿の人数が合わないと画面にエラーが出るので、開いて確認すればOK。</li>
-    <li>解禁コード(<code>CODE</code>)を決めておく。<b>当日発表するまで秘密</b>。</li>
-    <li>欠席が出たら、<b>解禁前に</b>名簿から行を消して更新する。</li>
-    <li>URLをQRコードにして受付や招待状に貼っておく。</li>
+    <li><code>ipad.html</code> の <code>CONFIG</code> を設定: ゲスト名簿(名前+性別+新郎側/新婦側)、各卓の枠、幹事の固定席(FIXED)、必ず同卓にしたいペア(PAIRS)。設定ミスは開いた瞬間にエラー表示されます。</li>
+    <li>枠が決まったら <code>waku.html</code> の図を新郎新婦に共有して合意をとる。</li>
+    <li>当日使うiPadのSafariで <code>ipad.html</code> を開き、「幹事」→PIN→<b>サーバーPINを保存</b>(スマホの座席ボードに映すために一度だけ)。</li>
+    <li>リハーサルで何回か引いてみたら、幹事メニューの「全リセット」で本番前にまっさらに戻す。</li>
   </ul>
 
   <p><span class="pill">当日</span></p>
   <div class="step">
     <div class="stepnum">1</div>
     <div class="steptext">
-      <h3>幹事コンソールに入る</h3>
-      <p>封印画面の下の「幹事の方はこちら」→ 幹事用PINを入力。</p>
+      <h3>受付にiPadを設置</h3>
+      <p>ipad.html を開いて待機画面のまま置いておくだけ。結果画面は15秒で自動的に待機画面へ戻ります。</p>
+      <p class="note">Safariの「データを消去」をしないこと(確定履歴はこのiPadの中にあります)。画面ロックの自動オフも切っておくと安心。</p>
     </div>
   </div>
   <div class="step">
     <div class="stepnum">2</div>
     <div class="steptext">
-      <h3>タイミングが来たら、赤いボタンをドン!</h3>
-      <p>「🔓 全員の封印を解く」を押すと、数秒以内に会場全員のスマホが一斉にスロット演出をはじめます。マイクで「今だ!スマホを見ろ!」と煽ると盛り上がります。</p>
-      <img class="shot" src="img/7_admin.png" alt="幹事コンソール">
+      <h3>間違いは「幹事」メニューで取り消し</h3>
+      <p>待機画面の「幹事」→PIN入力で、確定履歴の一覧から1件ずつ取り消せます。取り消した人は名前一覧に復活します。</p>
     </div>
   </div>
   <div class="step">
     <div class="stepnum">3</div>
     <div class="steptext">
-      <h3>フライング検挙リストで罰ゲーム発表</h3>
-      <p>コンソールには、封印を先に開けようとした人が<b>名前と時刻つき</b>で並んでいます。「山本くん、18時2分。乾杯前だよねぇ?」— 罰ゲームへどうぞ。</p>
-      <p class="note">結果画面のスタンプでも見分けられます:赤い「フライング検挙」=クロ、緑の「良い子の証」=シロ。</p>
+      <h3>全員が引き終わったら</h3>
+      <p>iPadに「🎉 全席確定! 🎉」が出ます。あとは焼肉を楽しむだけ。</p>
     </div>
   </div>
 
   <div class="callout warn">
-    <b class="title">⚠️ 幹事のたったひとつの鉄の掟</b>
-    <b>解禁したあとは、名簿も解禁コードも絶対に変更しない</b>こと。変更すると全員の抽選結果が変わってしまい、すでに座った人とズレて大混乱になります。欠席反映などの変更は必ず解禁前に。
+    <b class="title">⚠️ 幹事の鉄の掟</b>
+    <b>受付が始まったら、名簿や枠(CONFIG)を変更しないこと。</b>変更すると事故防止のため自動で全リセットされ、全員引き直しになります。欠席の反映などは必ず受付開始前に。<br>
+    また、くじを引くiPadは<b>必ず1台だけ</b>。複数台に増やすとそれぞれ別の抽選になってしまいます。
   </div>
 
   <div class="callout">
     <b class="title">🔁 リハーサルをしたいとき</b>
-    幹事コンソールの「リセット(リハーサル用)」で封印状態に戻り、検挙リストも消えます。テストで開いてしまった自分のスマホは、タブを閉じて開き直せば封印画面に戻ります。
+    何回引いてもOK。終わったら幹事メニューの「全リセット(抽選やり直し)」でまっさらに戻ります(抽選の中身も引き直されるので、リハーサルの結果はネタバレになりません)。
   </div>
 
   <footer>
     席決めの儀 ☠️ — Powered by 運命 &amp; JavaScript<br>
-    アプリ本体: <a href="./index.html">index.html</a>
+    座席ボード: <a href="./index.html">index.html</a> ／ iPad受付: <a href="./ipad.html">ipad.html</a> ／ 枠の図: <a href="./waku.html">waku.html</a>
   </footer>
 
 </div>
