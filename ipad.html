@@ -784,6 +784,11 @@ if(configChanged){
 }
 renderStandby();
 syncBoard();  // 起動時にも送っておく(サーバー再起動後の自動復旧を兼ねる)
+
+/* オフライン保険: 一度開けばサーバー停止・圏外でも開き直せる */
+if("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")){
+  navigator.serviceWorker.register("/sw.js").catch(()=>{});
+}
 </script>
 </body>
 </html>

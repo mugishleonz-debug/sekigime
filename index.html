@@ -169,6 +169,11 @@ document.addEventListener("visibilitychange", ()=>{
   else clearTimeout(timer);
 });
 refresh().then(schedule);
+
+/* オフライン保険: 一度開けばサーバー停止・圏外でも開き直せる */
+if("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")){
+  navigator.serviceWorker.register("/sw.js").catch(()=>{});
+}
 </script>
 </body>
 </html>

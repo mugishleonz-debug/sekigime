@@ -86,9 +86,32 @@ const MIME: Record<string, string> = {
   html: "text/html; charset=utf-8",
   png: "image/png",
 };
+/* Service Worker: 一度開いたページを端末に保存し、サーバー停止・圏外でも
+   開き直せるようにする(ネット優先・失敗時キャッシュ)。当日の保険。 */
+const SW_JS = `
+const CACHE = "sekigime-v1";
+self.addEventListener("install", () => self.skipWaiting());
+self.addEventListener("activate", (e) => e.waitUntil(clients.claim()));
+self.addEventListener("fetch", (e) => {
+  if (e.request.method !== "GET") return;
+  const p = new URL(e.request.url).pathname;
+  if (!["/", "/index.html", "/ipad", "/ipad.html", "/waku", "/guide"].includes(p)) return;
+  e.respondWith(
+    fetch(e.request).then((r) => {
+      const copy = r.clone();
+      caches.open(CACHE).then((c) => c.put(e.request, copy));
+      return r;
+    }).catch(() => caches.match(e.request))
+  );
+});
+`;
+
 async function serveStatic(path: string): Promise<Response | null> {
   if (path === "/robots.txt") {
     return new Response("User-agent: *\nDisallow: /\n", { headers: { "content-type": "text/plain" } });
+  }
+  if (path === "/sw.js") {
+    return new Response(SW_JS, { headers: { "content-type": "text/javascript", "cache-control": "no-cache" } });
   }
   let file = STATIC_ROUTES[path];
   if (!file && path.startsWith("/img/") && /^[\w.-]+$/.test(path.slice(5))) {
