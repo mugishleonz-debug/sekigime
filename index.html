@@ -154,8 +154,20 @@ async function refresh(){
 }
 
 $("search").addEventListener("input", e=>{ filter = e.target.value; render(); });
-refresh();
-setInterval(refresh, 10000);
+
+/* ポーリングは控えめに: 通常30秒、全席確定後は60秒、画面を見ていない間は止める */
+let timer = null;
+function schedule(){
+  clearTimeout(timer);
+  if(document.hidden) return;
+  const done = data && data.board.length >= data.total;
+  timer = setTimeout(async ()=>{ await refresh(); schedule(); }, done ? 60000 : 30000);
+}
+document.addEventListener("visibilitychange", ()=>{
+  if(!document.hidden){ refresh().then(schedule); }
+  else clearTimeout(timer);
+});
+refresh().then(schedule);
 </script>
 </body>
 </html>

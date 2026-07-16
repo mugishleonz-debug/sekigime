@@ -102,7 +102,7 @@ async function serveStatic(path: string): Promise<Response | null> {
       headers: {
         "content-type": MIME[ext] ?? "application/octet-stream",
         "x-robots-tag": "noindex, nofollow",
-        "cache-control": "no-cache",
+        "cache-control": ext === "png" ? "public, max-age=600" : "public, max-age=60",
       },
     });
   } catch {
