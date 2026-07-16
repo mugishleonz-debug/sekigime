@@ -73,10 +73,52 @@ function json(data: unknown, status = 200): Response {
   });
 }
 
+/* ---- 静的ページ配信 ----
+   実名入りのページ一式は Git に入れず、デプロイ元の server/static/ から
+   ここで配る(URLを知っている人だけが見られる。noindexで検索にも載せない)。 */
+const STATIC_ROUTES: Record<string, string> = {
+  "/": "index.html", "/index.html": "index.html",
+  "/ipad": "ipad.html", "/ipad.html": "ipad.html",
+  "/waku": "waku.html", "/waku.html": "waku.html",
+  "/guide": "guide.html", "/guide.html": "guide.html",
+};
+const MIME: Record<string, string> = {
+  html: "text/html; charset=utf-8",
+  png: "image/png",
+};
+async function serveStatic(path: string): Promise<Response | null> {
+  if (path === "/robots.txt") {
+    return new Response("User-agent: *\nDisallow: /\n", { headers: { "content-type": "text/plain" } });
+  }
+  let file = STATIC_ROUTES[path];
+  if (!file && path.startsWith("/img/") && /^[\w.-]+$/.test(path.slice(5))) {
+    file = path.slice(1);
+  }
+  if (!file) return null;
+  try {
+    const data = await Deno.readFile(new URL("./static/" + file, import.meta.url));
+    const ext = file.split(".").pop() ?? "";
+    return new Response(data, {
+      headers: {
+        "content-type": MIME[ext] ?? "application/octet-stream",
+        "x-robots-tag": "noindex, nofollow",
+        "cache-control": "no-cache",
+      },
+    });
+  } catch {
+    return null;
+  }
+}
+
 export default {
   async fetch(req: Request): Promise<Response> {
     if (req.method === "OPTIONS") return new Response(null, { headers: cors });
     const path = new URL(req.url).pathname;
+
+    if (req.method === "GET") {
+      const st = await serveStatic(path);
+      if (st) return st;
+    }
 
     // ゲスト用: 解禁されたか?
     if (path === "/state") {
