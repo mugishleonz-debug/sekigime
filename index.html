@@ -102,7 +102,7 @@
    このページはそれを10秒ごとに取りに行って表示するだけ。
    名簿も抽選ロジックも持たない(iPadが唯一の真実)。
    ================================================================ */
-const SERVER = "https://sekigime.mugishleonz-debug.deno.net";
+const SERVER = "";  // デモ版は本番サーバーに接続しない(本物は Deno Deploy 配信版)
 
 const $ = id => document.getElementById(id);
 let data = null;
@@ -142,6 +142,7 @@ function render(){
 }
 
 async function refresh(){
+  if(!SERVER){ data = null; render(); return; }   // デモ版: 通信しない
   try{
     const r = await fetch(SERVER + "/board");
     const j = await r.json();
